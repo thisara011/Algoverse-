@@ -228,6 +228,7 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-cyan-400"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-cyan-400"></div>
 
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-pulse">
             TRAFFIC SIMULATION // MAX FLOW PROTOCOL
@@ -254,7 +255,9 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Main Layout - Network Graph on Top, Controls at Bottom */}
+        <div className="space-y-6">
+          {/* Network Graph Section - Full Width */}
           <div>
             <h2 className="text-cyan-400 mb-4 tracking-wider border-l-4 border-cyan-400 pl-4 text-2xl">
               &gt;&gt; TRAFFIC NETWORK
@@ -267,29 +270,35 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
             <TrafficNetwork edges={gameState.edges} />
           </div>
 
-          <div className="space-y-6">
+          {/* Bottom Control Panel - Horizontal Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* System Status Panel */}
-            <SystemStatus
-              status={systemStatus.status}
-              lastRun={systemStatus.lastRun}
-              score={systemStatus.score}
-            />
-
-            {gameState.phase === 'input' && (
-              <GameInput onSubmit={handleSubmitAnswer} />
-            )}
-
-            {gameState.phase === 'result' && (
-              <GameResult
-                result={gameState.result!}
-                playerAnswer={gameState.playerAnswer!}
-                correctAnswer={gameState.correctAnswer!}
-                algorithm1Time={gameState.algorithm1Time}
-                algorithm2Time={gameState.algorithm2Time}
-                playerName={gameState.playerName}
-                onPlayAgain={handlePlayAgain}
+            <div className="lg:col-span-1">
+              <SystemStatus
+                status={systemStatus.status}
+                lastRun={systemStatus.lastRun}
+                score={systemStatus.score}
               />
-            )}
+            </div>
+
+            {/* Game Input/Result Panel */}
+            <div className="lg:col-span-2">
+              {gameState.phase === 'input' && (
+                <GameInput onSubmit={handleSubmitAnswer} />
+              )}
+
+              {gameState.phase === 'result' && (
+                <GameResult
+                  result={gameState.result!}
+                  playerAnswer={gameState.playerAnswer!}
+                  correctAnswer={gameState.correctAnswer!}
+                  algorithm1Time={gameState.algorithm1Time}
+                  algorithm2Time={gameState.algorithm2Time}
+                  playerName={gameState.playerName}
+                  onPlayAgain={handlePlayAgain}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
