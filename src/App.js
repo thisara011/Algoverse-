@@ -1,193 +1,200 @@
-// src/App.js
+// src/App.js (FINAL FIXED VERSION)
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import './App.css'; // Add basic styling later
-
+import React, { useState, useEffect, useCallback } from 'react';
+import './App.css'; 
+import { supabase } from './lib/supabaseClient'; 
 import { generateDistanceMatrix, indexToCity, cityToIndex } from './lib/utils';
 import { solveTSPBruteForce } from './lib/tsp';
 
-const NUM_CITIES = 10; // Cities A through J
+// ⭐ UNIVERSAL DEEP CLEANER (Fixes Supabase \u0000 null-byte error)
+function deepClean(value) {
+    if (Array.isArray(value)) {
+        return value
+            .filter(v => v !== undefined && v !== null)
+            .map(v => deepClean(v));
+    }
+
+    if (typeof value === 'object' && value !== null) {
+        return Object.fromEntries(
+            Object.entries(value).map(([k, v]) => [k, deepClean(v)])
+        );
+    }
+
+    if (typeof value === 'string') {
+        return value.replace(/\u0000/g, '');
+    }
+
+    return value;
+}
+
+const NUM_CITIES = 10;
 const CITIES = Array.from({ length: NUM_CITIES }, (_, i) => indexToCity(i));
 
 function App() {
-    // Game State
     const [distanceMatrix, setDistanceMatrix] = useState(null);
-    const [homeCity, setHomeCity] = useState(CITIES[0]); // Default to City A
-    const [targetCities, setTargetCities] = useState([]); // Cities the player must visit
+    const [homeCity, setHomeCity] = useState(CITIES[0]);
+    const [targetCities, setTargetCities] = useState([]);
     const [playerPath, setPlayerPath] = useState([]);
     const [gameRound, setGameRound] = useState(1);
-    
-    // Algorithm Result State
     const [algorithmResults, setAlgorithmResults] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
-    // 1. Initialize a new game round
+    // ⭐ SAVE GAME RESULT TO SUPABASE
+    const saveGameResult = useCallback(async (results) => {
+        setIsSaving(true);
+        
+        if (!distanceMatrix || !results.bruteForce) {
+            console.error("Cannot save: Missing required game data.");
+            setIsSaving(false);
+            return;
+        }
+
+        // Clean distance matrix
+        const cleanedDistanceMatrix = distanceMatrix.map(row =>
+            row.map(val => (val === null || val === undefined || isNaN(val)) ? 0 : val)
+        );
+
+        // Clean optimal path
+        const cleanedOptimalPath = results.bruteForce?.path
+            ?.filter(v => v !== null && v !== undefined)
+            .map(indexToCity) || [];
+
+        // 📦 Build payload
+        const rawPayload = {
+            home_city: homeCity,
+            target_cities: targetCities.join(", "),
+            optimal_distance: results.bruteForce?.distance ?? null,
+
+            game_data: {
+                distanceMatrix: cleanedDistanceMatrix,
+                algorithmResults: {
+                    bruteForceTime: results.bruteForce.timeTaken.toFixed(4),
+                    optimalPath: cleanedOptimalPath
+                },
+                // ⭐ Clean playerPath
+                playerPath: playerPath.filter(v => v !== null && v !== undefined)
+            }
+        };
+
+        // ⭐ Apply deep clean to ENTIRE payload
+        const finalPayload = deepClean(rawPayload);
+
+        // 📤 Insert into Supabase
+        const { data, error } = await supabase
+            .from('traveling_salesman_table')
+            .insert([finalPayload])
+            .select();
+
+        setIsSaving(false);
+
+        if (error) {
+            console.error("Supabase Error:", error);
+            alert("Failed to save results (check console).");
+        } else {
+            console.log("Game saved successfully:", data[0].id);
+        }
+
+    }, [homeCity, targetCities, distanceMatrix, playerPath]);
+
+    // ⭐ Run the algorithms
+    const runAlgorithms = useCallback(() => {
+        if (!distanceMatrix || targetCities.length === 0) return;
+
+        const homeIndex = cityToIndex(homeCity);
+        const targetIndices = targetCities.map(cityToIndex);
+
+        // Brute Force execution
+        const start = performance.now();
+        const bruteForceResult = solveTSPBruteForce(distanceMatrix, homeIndex, targetIndices);
+        const end = performance.now();
+
+        bruteForceResult.timeTaken = end - start;
+
+        const results = { bruteForce: bruteForceResult };
+
+        setAlgorithmResults(results);
+        saveGameResult(results);
+
+    }, [distanceMatrix, homeCity, targetCities, saveGameResult]);
+
+    // ⭐ Start new game
     const startNewGame = useCallback(() => {
-        // Randomly generate the distance matrix
         const newMatrix = generateDistanceMatrix(NUM_CITIES);
         setDistanceMatrix(newMatrix);
 
-        // Choose a random home city
-        const randomHomeIndex = Math.floor(Math.random() * NUM_CITIES);
-        setHomeCity(indexToCity(randomHomeIndex));
+        const randomHome = Math.floor(Math.random() * NUM_CITIES);
+        setHomeCity(indexToCity(randomHome));
 
-        // Randomly select 3-5 target cities (excluding the home city)
-        let potentialTargets = CITIES.filter(city => city !== indexToCity(randomHomeIndex));
-        let shuffledTargets = potentialTargets.sort(() => 0.5 - Math.random());
-        const numTargets = Math.floor(Math.random() * (5 - 3 + 1)) + 3; // 3 to 5 targets
-        setTargetCities(shuffledTargets.slice(0, numTargets));
-        
-        // Reset player state
+        let potentialTargets = CITIES.filter(c => c !== indexToCity(randomHome));
+        potentialTargets = potentialTargets.sort(() => 0.5 - Math.random());
+        const numTargets = Math.floor(Math.random() * 3) + 3;
+
+        setTargetCities(potentialTargets.slice(0, numTargets));
         setPlayerPath([]);
         setAlgorithmResults(null);
     }, []);
 
     useEffect(() => {
         startNewGame();
-    }, [startNewGame, gameRound]); // Runs on component mount and new round start
-
-    // Function to run the algorithms
-    const runAlgorithms = () => {
-        if (!distanceMatrix || targetCities.length === 0) return;
-
-        const homeIndex = cityToIndex(homeCity);
-        const targetIndices = targetCities.map(cityToIndex);
-
-        const bruteForceResult = solveTSPBruteForce(
-            distanceMatrix,
-            homeIndex,
-            targetIndices
-        );
-
-        // In a full implementation, you'd call Dynamic Programming and Heuristic here too.
-        setAlgorithmResults({
-            bruteForce: bruteForceResult,
-            // dp: solveTSPDP(...),
-            // heuristic: solveTSPHeuristic(...),
-        });
-        
-        // After running the algorithms, you would save this data to a database.
-        // (This would require a backend setup, which is out of scope for a simple React frontend.)
-    };
-
-    // Placeholder for the player making a guess
-    const handleSubmitGuess = () => {
-        // In the real game, you would calculate the playerPath distance here
-        // and compare it to the bruteForceResult.distance.
-        // For simplicity, we'll just run the algorithms when the player submits.
-        runAlgorithms();
-    };
+    }, [startNewGame, gameRound]);
 
     if (!distanceMatrix) {
-        return <div className="loading">Loading New Game...</div>;
+        return <div className="loading-container">Loading New Game...</div>;
     }
 
     return (
-        <div className="app-container">
-            <header>
-                <h1>🗺️ Traveling Salesman Game - Round {gameRound}</h1>
+        <div className="app-layout">
+            <header className="header">
+                <h1>TSP Algorithm Performance Analyzer</h1>
             </header>
-            
-            <section className="game-info">
-                <p>
-                    **Home City:** **{homeCity}** | **Cities to Visit (Exactly Once):** **{targetCities.join(', ')}**
-                </p>
-                <p className="task-description">
-                    *Task:* Find the shortest route that starts at **{homeCity}**, visits all cities: **{targetCities.join(', ')}**, and returns to **{homeCity}**.
-                </p>
-                <button onClick={runAlgorithms} disabled={algorithmResults !== null}>
-                    Show Shortest Route (Run Algorithms)
-                </button>
-            </section>
 
-            <hr />
+            <div className="main-content">
+                <div className="main-visualization-panel">
+                    <h2>City Network Visualization</h2>
+                    <div className="map-placeholder">
+                        <p>Visual map rendering area</p>
+                    </div>
 
-            <section className="map-view">
-                ## 📍 Distance Matrix (The Map)
-                <p>The distances are randomly assigned between 50 and 100 km.</p>
-                {/*  */}
-                
-                {/* Display the Distance Matrix for the game */}
-                <table className="distance-table">
-                    <thead>
-                        <tr>
-                            <th>City</th>
-                            {CITIES.map(c => <th key={c}>{c}</th>)}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {CITIES.map((rowCity, i) => (
-                            <tr key={i}>
-                                <td>**{rowCity}**</td>
-                                {CITIES.map((colCity, j) => (
-                                    <td key={j}>
-                                        {i === j ? '---' : distanceMatrix[i][j]}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </section>
-            
-            <hr />
-            
-            {algorithmResults && (
-                <section className="results">
-                    ## 📊 Algorithmic Comparison
-                    <table className="results-table">
-                        <thead>
-                            <tr>
-                                <th>Algorithm</th>
-                                <th>Shortest Route</th>
-                                <th>Distance (km)</th>
-                                <th>Time Taken (ms)</th>
-                                <th>Complexity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>**Brute Force**</td>
-                                <td>{algorithmResults.bruteForce.path.join(' -> ')}</td>
-                                <td>**{algorithmResults.bruteForce.distance}**</td>
-                                <td>{algorithmResults.bruteForce.timeTaken.toFixed(4)}</td>
-                                <td>$O(n!)$</td>
-                            </tr>
-                            {/* You would add DP and Heuristic results here */}
-                            <tr>
-                                <td>Dynamic Programming</td>
-                                <td>*Implementation pending*</td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                                <td>$O(n^2 2^n)$</td>
-                            </tr>
-                            <tr>
-                                <td>Nearest Neighbor (Heuristic)</td>
-                                <td>*Implementation pending*</td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                                <td>$O(n^2)$</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className="card matrix-display">
+                        <h3>Current Distance Matrix</h3>
+                        <p>Matrix Size: {NUM_CITIES} x {NUM_CITIES}</p>
+                    </div>
+                </div>
 
-                    <button onClick={() => setGameRound(r => r + 1)}>
-                        Start Next Round
-                    </button>
-                </section>
-            )}
-            
-            <hr />
+                <div className="sidebar-controls">
+                    <div className="card game-state">
+                        <h3>Current Game State</h3>
+                        <p><strong>Home City:</strong> {homeCity}</p>
+                        <p><strong>Target Cities:</strong> {targetCities.join(", ")}</p>
+                    </div>
 
-            <section className="player-interface">
-                ## 🎮 Player's Guess
-                <p>
-                    *Current Path (Click cities on the map component to select them):* **{playerPath.length > 0 ? playerPath.join(' -> ') : 'Not started'}**
-                </p>
-                <button onClick={handleSubmitGuess} disabled={algorithmResults !== null}>
-                    Submit Route & Compare
-                </button>
-                <p className="note">*(Player selection logic is simplified for this demo)*</p>
-            </section>
+                    <div className="card actions-panel">
+                        <h3>Actions</h3>
+                        <button onClick={runAlgorithms} disabled={isSaving} className="primary-button">
+                            {isSaving ? "Saving..." : "Run Algorithms & Save"}
+                        </button>
+
+                        <button 
+                            className="secondary-button" 
+                            onClick={() => setGameRound(g => g + 1)}
+                            disabled={isSaving}
+                        >
+                            Start New Game ({gameRound + 1})
+                        </button>
+                    </div>
+
+                    {algorithmResults && algorithmResults.bruteForce && (
+                        <div className="card results-panel">
+                            <h3>Optimization Results</h3>
+                            <p><strong>Optimal Distance:</strong> {algorithmResults.bruteForce.distance}</p>
+                            <p><strong>Optimal Path:</strong> 
+                                {algorithmResults.bruteForce.path.map(indexToCity).join(" → ")}
+                            </p>
+                            <p>Runtime: {algorithmResults.bruteForce.timeTaken.toFixed(4)} ms</p>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }
