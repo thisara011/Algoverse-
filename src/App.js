@@ -5,6 +5,7 @@ import './App.css';
 import { supabase } from './lib/supabaseClient'; 
 import { generateDistanceMatrix, indexToCity, cityToIndex } from './lib/utils';
 import { solveTSPBruteForce } from './lib/tsp';
+import CityMap from './components/CityMap';
 
 // ⭐ UNIVERSAL DEEP CLEANER (Fixes Supabase \u0000 null-byte error)
 function deepClean(value) {
@@ -151,8 +152,15 @@ function App() {
             <div className="main-content">
                 <div className="main-visualization-panel">
                     <h2>City Network Visualization</h2>
-                    <div className="map-placeholder">
-                        <p>Visual map rendering area</p>
+                    <div className="map-card card">
+                        <CityMap
+                            cities={CITIES}
+                            distanceMatrix={distanceMatrix}
+                            homeCity={homeCity}
+                            targetCities={targetCities}
+                            playerPath={playerPath}
+                            algorithmResults={algorithmResults}
+                        />
                     </div>
 
                     <div className="card matrix-display">

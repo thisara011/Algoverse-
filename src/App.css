@@ -42,14 +42,31 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.map-placeholder {
-    height: 400px;
-    background-color: #ecf0f1;
+.map-card {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 4px;
+    padding: 12px;
     margin: 20px 0;
+}
+
+.map-container {
+    width: 100%;
+    max-width: 720px;
+    height: 520px;
+    background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+    border-radius: 8px;
+    box-shadow: 0 6px 14px rgba(20, 30, 40, 0.06);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Smaller devices */
+@media (max-width: 800px) {
+    .main-content { grid-template-columns: 1fr; }
+    .map-container { height: 420px; max-width: 100%; }
 }
 
 /* Typography and Highlighting */
