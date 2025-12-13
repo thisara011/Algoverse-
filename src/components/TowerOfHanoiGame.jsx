@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient.js';
 import { runAndLogSolvers, getOptimalMoves } from '../utils/hanoiSolvers.js';
 
@@ -13,44 +13,52 @@ const Disk = ({ disk, color }) => {
   const width = 40 + disk * 18; 
   return (
     <div
-      className="h-7 rounded-lg shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)] border border-black/10 relative overflow-hidden transition-all duration-300"
-      style={{ width: `${width}px`, backgroundColor: color }}
+      className="h-7 rounded-lg border-2 relative overflow-hidden transition-all duration-300 shadow-lg"
+      style={{ 
+        width: `${width}px`, 
+        backgroundColor: color,
+        boxShadow: `0 0 15px ${color}, inset 0 0 10px rgba(255,255,255,0.3)`,
+        borderColor: 'rgba(255, 255, 255, 0.6)'
+      }}
     >
-      {/* Glossy highlight effect */}
-      <div className="absolute top-0 left-0 right-0 h-1/3 bg-white/20"></div>
+      {/* Neon glow highlight effect */}
+      <div className="absolute top-0 left-0 right-0 h-1/3 bg-white/40"></div>
+      <div className="absolute inset-0 animate-pulse opacity-30" style={{ backgroundColor: color }}></div>
     </div>
   );
 };
 
 // Renders a single peg
 const Peg = ({ name, disks, onPegClick, isSelected }) => {
-  // Disk colors
+  // Cyberpunk neon colors
   const colors = [
-    '#f87171', // Red
-    '#fb923c', // Orange
-    '#fbbf24', // Amber
-    '#a3e635', // Lime
-    '#34d399', // Emerald
-    '#22d3ee', // Cyan
-    '#60a5fa', // Blue
-    '#818cf8', // Indigo
-    '#c084fc', // Violet
-    '#f472b6'  // Pink
+    '#FF006E', // Hot Pink
+    '#FB5607', // Orange
+    '#FFBE0B', // Yellow
+    '#8338EC', // Purple
+    '#3A86FF', // Blue
+    '#06FFA5', // Neon Green
+    '#FF006E', // Hot Pink
+    '#FB5607', // Orange
+    '#FFBE0B', // Yellow
+    '#8338EC'  // Purple
   ];
 
   return (
     <div className="group flex flex-col items-center justify-end w-32 sm:w-40 h-80 transition-transform duration-200">
       {/* Peg Interaction Area */}
       <div 
-        className={`relative flex flex-col-reverse items-center justify-start w-full h-full cursor-pointer transition-all duration-300 rounded-xl p-2
-          ${isSelected ? 'bg-indigo-50/50 scale-105' : 'hover:bg-gray-50/50'}
+        className={`relative flex flex-col-reverse items-center justify-start w-full h-full cursor-pointer transition-all duration-300 rounded-xl p-2 backdrop-blur-sm
+          ${isSelected ? 'bg-cyan-500/20 scale-105 border border-cyan-400/50' : 'hover:bg-purple-500/10 border border-transparent'}
         `}
         onClick={() => onPegClick && onPegClick(name)}
       >
-        {/* The Pole */}
-        <div className={`absolute bottom-0 w-4 h-[90%] rounded-t-lg transition-colors duration-300 shadow-inner
-          ${isSelected ? 'bg-indigo-300' : 'bg-amber-800/80'}
-        `}></div>
+        {/* The Pole - Neon Glow */}
+        <div 
+          className={`absolute bottom-0 w-4 h-[90%] rounded-t-lg transition-all duration-300
+            ${isSelected ? 'bg-cyan-400 shadow-[0_0_20px_rgba(0,255,221,0.8)]' : 'bg-purple-600/80 shadow-[0_0_15px_rgba(139,92,246,0.6)]'}
+          `}
+        ></div>
 
         {/* The Disks */}
         <div className="z-10 flex flex-col-reverse items-center gap-[2px] mb-1">
@@ -61,43 +69,48 @@ const Peg = ({ name, disks, onPegClick, isSelected }) => {
       </div>
 
       {/* Peg Base */}
-      <div className={`w-28 sm:w-32 h-4 rounded-full shadow-md mt-1 transition-colors duration-300
-         ${isSelected ? 'bg-indigo-400' : 'bg-amber-900'}
-      `}></div>
+      <div 
+        className={`w-28 sm:w-32 h-4 rounded-full mt-1 transition-all duration-300
+           ${isSelected ? 'bg-cyan-400 shadow-[0_0_15px_rgba(0,255,221,0.8)]' : 'bg-purple-600/70 shadow-[0_0_10px_rgba(139,92,246,0.5)]'}
+        `}
+      ></div>
       
       {/* Label */}
-      <span className={`mt-3 text-2xl font-black transition-colors duration-300
-        ${isSelected ? 'text-indigo-600 scale-110' : 'text-gray-400 group-hover:text-gray-600'}
-      `}>{name}</span>
+      <span 
+        className={`mt-3 text-2xl font-black transition-all duration-300 tracking-widest
+          ${isSelected ? 'text-cyan-400 scale-110 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]' : 'text-purple-400 group-hover:text-cyan-300 drop-shadow-[0_0_5px_rgba(139,92,246,0.6)]'}
+        `}
+      >{name}</span>
     </div>
   );
 };
 
 // --- Game Rules Modal ---
 const GameRulesModal = ({ onClose }) => (
-  <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 flex justify-between items-center text-white">
-        <h2 className="text-3xl font-extrabold flex items-center gap-3"><span>📜</span> How to Play</h2>
-        <button onClick={onClose} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+  <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+    <div className="bg-gradient-to-br from-slate-900 to-purple-900 rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh] border border-cyan-500/30">
+      <div className="bg-gradient-to-r from-cyan-500 to-purple-600 p-6 flex justify-between items-center text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(255,255,255,.05)_2px,rgba(255,255,255,.05)_4px)]"></div>
+        <h2 className="text-3xl font-extrabold flex items-center gap-3 relative z-10 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]"><span>📜</span> GAME RULES</h2>
+        <button onClick={onClose} className="p-2 bg-cyan-400/20 hover:bg-cyan-400/40 rounded-full transition-all border border-cyan-400/50 relative z-10">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
-      <div className="p-8 overflow-y-auto bg-slate-50">
+      <div className="p-8 overflow-y-auto bg-slate-900/50 backdrop-blur-sm">
         <div className="grid md:grid-cols-2 gap-8">
           {/* 3-Peg Instructions */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <div className="bg-green-100 p-2 rounded-lg text-green-600">🧠</div> 3-Peg Classic
+          <div className="bg-gradient-to-br from-purple-900/50 to-cyan-900/30 p-6 rounded-2xl border border-purple-500/30 backdrop-blur-sm">
+            <h3 className="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,255,221,0.5)]">
+              <div className="bg-cyan-500/30 p-2 rounded-lg text-cyan-400 border border-cyan-400/50">🧠</div> 3-PEG CLASSIC
             </h3>
-            <div className="space-y-4 text-slate-600 text-sm leading-relaxed">
-              <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                <strong className="text-green-700 block mb-1">🎯 Objective</strong>
-                Move all disks from <span className="font-semibold">Source (A)</span> to <span className="font-semibold">Dest (C)</span>.
+            <div className="space-y-4 text-cyan-100/80 text-sm leading-relaxed">
+              <div className="bg-cyan-900/30 p-3 rounded-lg border border-cyan-500/30">
+                <strong className="text-cyan-400 block mb-1 drop-shadow-[0_0_5px_rgba(0,255,221,0.6)]">🎯 OBJECTIVE</strong>
+                Move all disks from <span className="font-semibold text-cyan-300">Source (A)</span> to <span className="font-semibold text-cyan-300">Dest (C)</span>.
               </div>
-              <ul className="space-y-2 marker:text-green-500 list-disc pl-5">
+              <ul className="space-y-2 marker:text-cyan-400 list-disc pl-5">
                 <li>Only one disk can be moved at a time.</li>
                 <li>A larger disk cannot be placed on a smaller disk.</li>
                 <li>Use <strong>Aux (B)</strong> as temporary storage.</li>
@@ -105,31 +118,31 @@ const GameRulesModal = ({ onClose }) => (
             </div>
           </div>
           {/* 4-Peg Instructions */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <div className="bg-blue-100 p-2 rounded-lg text-blue-600">🚀</div> 4-Peg Reve's Puzzle
+          <div className="bg-gradient-to-br from-purple-900/50 to-cyan-900/30 p-6 rounded-2xl border border-purple-500/30 backdrop-blur-sm">
+            <h3 className="text-2xl font-bold text-pink-400 mb-4 flex items-center gap-2 drop-shadow-[0_0_10px_rgba(255,0,110,0.5)]">
+              <div className="bg-pink-500/30 p-2 rounded-lg text-pink-400 border border-pink-400/50">🚀</div> 4-PEG REVE'S PUZZLE
             </h3>
-            <div className="space-y-4 text-slate-600 text-sm leading-relaxed">
-              <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                <strong className="text-blue-700 block mb-1">🎯 Objective</strong>
-                Move all disks from <span className="font-semibold">Source (A)</span> to <span className="font-semibold">Dest (D)</span>.
+            <div className="space-y-4 text-cyan-100/80 text-sm leading-relaxed">
+              <div className="bg-pink-900/30 p-3 rounded-lg border border-pink-500/30">
+                <strong className="text-pink-400 block mb-1 drop-shadow-[0_0_5px_rgba(255,0,110,0.6)]">🎯 OBJECTIVE</strong>
+                Move all disks from <span className="font-semibold text-pink-300">Source (A)</span> to <span className="font-semibold text-pink-300">Dest (D)</span>.
               </div>
-              <ul className="space-y-2 marker:text-blue-500 list-disc pl-5">
+              <ul className="space-y-2 marker:text-pink-400 list-disc pl-5">
                 <li>Same rules apply (one at a time, size order).</li>
                 <li>You have <strong>TWO</strong> auxiliary pegs (B & C).</li>
               </ul>
             </div>
           </div>
         </div>
-        <div className="mt-8 bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-          <h4 className="font-bold text-indigo-900 mb-2 flex items-center gap-2"><span>🎮</span> Controls</h4>
-          <p className="text-indigo-800 text-sm">
+        <div className="mt-8 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 p-6 rounded-2xl border border-cyan-400/30 backdrop-blur-sm">
+          <h4 className="font-bold text-cyan-300 mb-2 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(0,255,221,0.5)]"><span>🎮</span> CONTROLS</h4>
+          <p className="text-cyan-100/80 text-sm">
             <strong>Tap/Click</strong> a peg to pick up the top disk and another to drop it. 
-            <strong>OR</strong> use the Manual Move controls to select Source and Destination from the dropdowns.
+            <strong className="text-cyan-300"> OR</strong> use the Manual Move controls to select Source and Destination from the dropdowns.
           </p>
         </div>
         <div className="mt-8 text-center">
-          <button onClick={onClose} className="px-12 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all">Let's Play!</button>
+          <button onClick={onClose} className="px-12 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-slate-900 font-bold rounded-xl hover:shadow-[0_0_20px_rgba(0,255,221,0.8)] hover:scale-105 transition-all border border-cyan-400/50 drop-shadow-[0_0_10px_rgba(0,255,221,0.5)]">LAUNCH GAME</button>
         </div>
       </div>
     </div>
@@ -349,30 +362,34 @@ const TowerOfHanoiGame = () => {
 
   const renderSetup = () => (
     <div className="text-center w-full max-w-2xl mx-auto">
-      <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
-        <h2 className="text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-          Tower of Hanoi
+      <div className="bg-gradient-to-br from-slate-900 to-purple-900 p-10 rounded-3xl shadow-2xl border border-cyan-400/30 backdrop-blur-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-purple-600"></div>
+        <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
+        <h2 className="text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)] relative z-10">
+          ⚔️ TOWER OF HANOI
         </h2>
-        <div className="mb-8">
-          <p className="text-gray-500 uppercase tracking-wide text-xs font-bold mb-2">Current Challenge</p>
-          <div className="text-6xl font-black text-slate-800">{n} <span className="text-2xl font-medium text-gray-400">Disks</span></div>
+        <div className="mb-8 relative z-10">
+          <p className="text-cyan-400/70 uppercase tracking-widest text-xs font-bold mb-2 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">Current Challenge</p>
+          <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]">{n} <span className="text-2xl font-medium text-purple-400">DISKS</span></div>
         </div>
-        <p className="text-lg text-gray-600 mb-6">Choose your difficulty:</p>
-        <div className="grid grid-cols-2 gap-6 mb-8">
-          <button onClick={() => selectPegs(3)} className="group relative px-8 py-6 bg-gradient-to-br from-green-400 to-emerald-600 text-white rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
-            <span className="text-2xl font-bold block mb-1">3 Pegs</span>
-            <span className="text-green-100 text-sm">Classic Mode</span>
+        <p className="text-lg text-cyan-100/80 mb-6 relative z-10">SELECT YOUR DIFFICULTY:</p>
+        <div className="grid grid-cols-2 gap-6 mb-8 relative z-10">
+          <button onClick={() => selectPegs(3)} className="group relative px-8 py-6 bg-gradient-to-br from-cyan-500 to-cyan-600 text-slate-900 rounded-2xl hover:shadow-[0_0_30px_rgba(0,255,221,0.8)] hover:-translate-y-1 transition-all font-bold border border-cyan-400/50 hover:border-cyan-300">
+            <span className="text-2xl font-black block mb-1">3 PEGS</span>
+            <span className="text-slate-800 text-sm font-semibold">CLASSIC MODE</span>
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-cyan-400/20 to-transparent"></div>
           </button>
-          <button onClick={() => selectPegs(4)} className="group relative px-8 py-6 bg-gradient-to-br from-blue-400 to-indigo-600 text-white rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
-            <span className="text-2xl font-bold block mb-1">4 Pegs</span>
-            <span className="text-blue-100 text-sm">Reve's Puzzle</span>
+          <button onClick={() => selectPegs(4)} className="group relative px-8 py-6 bg-gradient-to-br from-purple-600 to-purple-700 text-slate-900 rounded-2xl hover:shadow-[0_0_30px_rgba(139,92,246,0.8)] hover:-translate-y-1 transition-all font-bold border border-purple-400/50 hover:border-purple-300">
+            <span className="text-2xl font-black block mb-1">4 PEGS</span>
+            <span className="text-slate-200 text-sm font-semibold">REVE'S PUZZLE</span>
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-purple-400/20 to-transparent"></div>
           </button>
         </div>
-        <button onClick={() => setShowRules(true)} className="text-gray-400 hover:text-indigo-500 font-medium flex items-center justify-center gap-2 mx-auto transition-colors">
+        <button onClick={() => setShowRules(true)} className="text-cyan-400/70 hover:text-cyan-300 font-medium flex items-center justify-center gap-2 mx-auto transition-colors drop-shadow-[0_0_5px_rgba(0,255,221,0.3)] relative z-10">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          How to Play?
+          VIEW RULES
         </button>
       </div>
     </div>
@@ -380,23 +397,25 @@ const TowerOfHanoiGame = () => {
 
   const renderQuiz = () => (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">Pre-Game Quiz</h2>
-          <p className="text-gray-500 mt-2">For <strong className="text-indigo-600">{n} disks</strong> and <strong className="text-indigo-600">{m} pegs</strong>...</p>
+      <div className="bg-gradient-to-br from-slate-900 to-purple-900 p-8 rounded-3xl shadow-2xl border border-cyan-400/30 backdrop-blur-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-purple-600"></div>
+        <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
+        <div className="text-center mb-8 relative z-10">
+          <h2 className="text-2xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">PRE-GAME ASSESSMENT</h2>
+          <p className="text-cyan-100/60 mt-2">For <strong className="text-cyan-300 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{n} disks</strong> and <strong className="text-cyan-300 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{m} pegs</strong>...</p>
         </div>
-        <form onSubmit={startGame} className="space-y-6">
+        <form onSubmit={startGame} className="space-y-6 relative z-10">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Player Name</label>
-            <input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="Enter your name" required />
+            <label className="block text-sm font-bold text-cyan-400 uppercase ml-1 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">PILOT NAME</label>
+            <input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} className="w-full px-4 py-3 bg-slate-800 border border-cyan-400/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:bg-slate-800 transition-all text-cyan-100 placeholder:text-slate-500" placeholder="Enter your codename" required />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">What is the optimal number of moves?</label>
-            <input type="number" value={quizAnswer} onChange={(e) => setQuizAnswer(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="Your guess..." required />
+            <label className="block text-sm font-bold text-cyan-400 uppercase ml-1 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">OPTIMAL MOVE COUNT</label>
+            <input type="number" value={quizAnswer} onChange={(e) => setQuizAnswer(e.target.value)} className="w-full px-4 py-3 bg-slate-800 border border-cyan-400/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:bg-slate-800 transition-all text-cyan-100 placeholder:text-slate-500" placeholder="Your prediction..." required />
           </div>
           <div className="pt-2 flex flex-col gap-3">
-            <button type="submit" className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 hover:shadow-lg transform active:scale-95 transition-all">Start Game</button>
-            <button type="button" onClick={() => setShowRules(true)} className="text-sm text-gray-400 hover:text-indigo-600 transition-colors">Need a hint? Check Rules</button>
+            <button type="submit" className="w-full py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-900 font-black rounded-xl hover:shadow-[0_0_20px_rgba(0,255,221,0.8)] hover:scale-105 transform active:scale-95 transition-all border border-cyan-400/50 uppercase tracking-widest">INITIALIZE GAME</button>
+            <button type="button" onClick={() => setShowRules(true)} className="text-sm text-cyan-400/60 hover:text-cyan-300 transition-colors drop-shadow-[0_0_5px_rgba(0,255,221,0.3)]">Need help? Check RULES</button>
           </div>
         </form>
       </div>
@@ -410,23 +429,23 @@ const TowerOfHanoiGame = () => {
       <div className="flex-1 w-full flex flex-col items-center">
         {/* Stats Bar */}
         <div className="w-full max-w-2xl relative flex justify-center items-center mb-6">
-          <div className="flex items-center gap-8 bg-white px-10 py-4 rounded-full shadow-xl shadow-indigo-100/50 border border-indigo-50">
+          <div className="flex items-center gap-8 bg-gradient-to-br from-slate-800 to-purple-900 px-10 py-4 rounded-full shadow-2xl shadow-cyan-500/30 border border-cyan-400/30 backdrop-blur-sm">
             <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Moves</span>
-              <span className="text-3xl font-black text-indigo-600 tabular-nums">{moveCount}</span>
+              <span className="text-[10px] font-bold text-cyan-400/70 uppercase tracking-widest drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">Moves</span>
+              <span className="text-3xl font-black text-cyan-400 tabular-nums drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">{moveCount}</span>
             </div>
-            <div className="w-px h-10 bg-gray-100"></div>
+            <div className="w-px h-10 bg-purple-600/50"></div>
             <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target</span>
-              <span className="text-3xl font-black text-emerald-500 tabular-nums">{optimalMoves}</span>
+              <span className="text-[10px] font-bold text-pink-400/70 uppercase tracking-widest drop-shadow-[0_0_3px_rgba(255,0,110,0.3)]">Target</span>
+              <span className="text-3xl font-black text-pink-400 tabular-nums drop-shadow-[0_0_10px_rgba(255,0,110,0.6)]">{optimalMoves}</span>
             </div>
-            <div className="w-px h-10 bg-gray-100"></div>
+            <div className="w-px h-10 bg-purple-600/50"></div>
             <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Time</span>
-              <span className="text-3xl font-black text-blue-500 tabular-nums">{formatTime(timeElapsed)}</span>
+              <span className="text-[10px] font-bold text-purple-400/70 uppercase tracking-widest drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">Time</span>
+              <span className="text-3xl font-black text-purple-400 tabular-nums drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]">{formatTime(timeElapsed)}</span>
             </div>
           </div>
-          <button onClick={() => setShowRules(true)} className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-white hover:bg-gray-50 text-gray-400 hover:text-indigo-600 rounded-2xl shadow-md border border-gray-100 transition-all">
+          <button onClick={() => setShowRules(true)} className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-gradient-to-br from-slate-800 to-purple-900 hover:shadow-[0_0_20px_rgba(0,255,221,0.6)] text-cyan-400 hover:text-cyan-300 rounded-2xl border border-cyan-400/30 transition-all drop-shadow-[0_0_10px_rgba(0,255,221,0.3)]">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
@@ -435,8 +454,8 @@ const TowerOfHanoiGame = () => {
         
         {/* Game Area */}
         <div className="relative w-full flex justify-center">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r from-blue-100/50 via-purple-100/50 to-pink-100/50 rounded-full blur-3xl -z-10"></div>
-          <div className="flex justify-center items-end gap-4 sm:gap-12 p-8 sm:p-12 bg-white/60 backdrop-blur-md rounded-[3rem] shadow-2xl border border-white/60 min-h-[400px]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-pink-600/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
+          <div className="flex justify-center items-end gap-4 sm:gap-12 p-8 sm:p-12 bg-gradient-to-br from-slate-800/40 to-purple-900/40 backdrop-blur-xl rounded-[3rem] shadow-2xl border border-cyan-400/20 min-h-[400px]">
             {Object.keys(pegs).map((pegName) => (
               <Peg 
                 key={pegName}
@@ -453,61 +472,59 @@ const TowerOfHanoiGame = () => {
       {/* RIGHT: Manual Controls & History */}
       <div className="w-full lg:w-80 flex flex-col gap-4">
         {/* Manual Move Form */}
-        <div className="bg-white p-6 rounded-3xl shadow-lg border border-indigo-50">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span>🎮</span> Manual Move
+        <div className="bg-gradient-to-br from-slate-800 to-purple-900 p-6 rounded-3xl shadow-xl border border-cyan-400/30 backdrop-blur-sm">
+          <h3 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">
+            <span>🎮</span> MANUAL MOVE
           </h3>
           <form onSubmit={handleManualMove} className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="text-xs font-bold text-gray-400 uppercase ml-1">From</label>
+                <label className="text-xs font-bold text-cyan-400/70 uppercase ml-1 drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">From</label>
                 <select 
                   value={manualSource} 
                   onChange={(e) => setManualSource(e.target.value)}
-                  className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-2 bg-slate-700/50 border border-cyan-400/40 rounded-xl font-bold text-cyan-100 focus:ring-2 focus:ring-cyan-400 outline-none backdrop-blur-sm"
                 >
                   {pegNames.slice(0, m).map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
-              <div className="flex items-end pb-2 text-gray-300">→</div>
+              <div className="flex items-end pb-2 text-purple-400 font-bold">→</div>
               <div className="flex-1">
-                <label className="text-xs font-bold text-gray-400 uppercase ml-1">To</label>
+                <label className="text-xs font-bold text-cyan-400/70 uppercase ml-1 drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">To</label>
                 <select 
                   value={manualDest} 
                   onChange={(e) => setManualDest(e.target.value)}
-                  className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-2 bg-slate-700/50 border border-cyan-400/40 rounded-xl font-bold text-cyan-100 focus:ring-2 focus:ring-cyan-400 outline-none backdrop-blur-sm"
                 >
                   {pegNames.slice(0, m).map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
             </div>
-            <button type="submit" className="w-full py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition shadow-md">
-              Move Disk
+            <button type="submit" className="w-full py-2 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-900 font-bold rounded-xl hover:shadow-[0_0_15px_rgba(0,255,221,0.8)] transition-all border border-cyan-400/50 uppercase tracking-widest text-sm">
+              Execute Move
             </button>
           </form>
         </div>
 
         {/* Move History Log */}
-        {/* CHANGED: Removed fixed height (h-[400px]) and scroll (overflow-y-auto). Added natural height behavior. Reversed list order. */}
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 flex-1 flex flex-col">
-          <div className="p-4 border-b border-gray-100 bg-gray-50">
-            <h3 className="text-lg font-bold text-gray-700">Move Sequence</h3>
+        <div className="bg-gradient-to-br from-slate-800 to-purple-900 rounded-3xl shadow-xl border border-cyan-400/20 backdrop-blur-sm flex-1 flex flex-col">
+          <div className="p-4 border-b border-purple-600/30 bg-gradient-to-r from-slate-800/50 to-purple-900/50">
+            <h3 className="text-lg font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">MOVE SEQUENCE</h3>
           </div>
           <div className="flex-1 p-4 space-y-3">
             {moveHistory.length === 0 ? (
-              <p className="text-center text-gray-400 italic mt-4">Moves will appear here...</p>
+              <p className="text-center text-purple-400/60 italic mt-4">Awaiting your moves...</p>
             ) : (
-              // NOTE: Reversing array here so newest moves appear at the TOP
               [...moveHistory].reverse().map((move) => (
-                <div key={move.moveNum} className="flex items-center gap-3 text-sm bg-white border border-gray-100 p-2 rounded-lg shadow-sm">
-                  <span className="font-bold text-gray-400 w-6">#{move.moveNum}</span>
-                  <div className="flex items-center gap-2 bg-indigo-50 px-2 py-1 rounded text-indigo-700 font-bold border border-indigo-100">
+                <div key={move.moveNum} className="flex items-center gap-3 text-sm bg-slate-700/50 border border-purple-600/30 p-2 rounded-lg shadow-sm backdrop-blur-sm">
+                  <span className="font-bold text-purple-400/70 w-6 drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">#{move.moveNum}</span>
+                  <div className="flex items-center gap-2 bg-cyan-900/50 px-2 py-1 rounded text-cyan-300 font-bold border border-cyan-400/30">
                     <span>Disk {move.disk}</span>
                   </div>
-                  <span className="text-gray-400">from</span>
-                  <span className="font-bold text-gray-700 bg-gray-100 w-6 h-6 flex items-center justify-center rounded">{move.from}</span>
-                  <span className="text-gray-300">→</span>
-                  <span className="font-bold text-gray-700 bg-gray-100 w-6 h-6 flex items-center justify-center rounded">{move.to}</span>
+                  <span className="text-purple-400/60">from</span>
+                  <span className="font-bold text-cyan-400 bg-slate-700/70 w-6 h-6 flex items-center justify-center rounded border border-cyan-400/30 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{move.from}</span>
+                  <span className="text-purple-400/60">→</span>
+                  <span className="font-bold text-cyan-400 bg-slate-700/70 w-6 h-6 flex items-center justify-center rounded border border-cyan-400/30 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{move.to}</span>
                 </div>
               ))
             )}
@@ -520,32 +537,41 @@ const TowerOfHanoiGame = () => {
   const renderWon = () => (
     <div className="w-full flex flex-col lg:flex-row gap-8 items-center justify-center max-w-6xl mx-auto">
       <div className="text-center w-full max-w-lg">
-        <div className="bg-white p-10 rounded-3xl shadow-2xl border border-emerald-100 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500"></div>
-          <div className="text-6xl mb-6">🎉</div>
-          <h2 className="text-4xl font-black text-gray-800 mb-2">Victory!</h2>
-          <p className="text-gray-500 mb-8">Great job, <span className="font-bold text-indigo-600">{playerName}</span>!</p>
-          <div className="bg-emerald-50 rounded-2xl p-6 mb-8 border border-emerald-100">
+        <div className="bg-gradient-to-br from-slate-900 to-purple-900 p-10 rounded-3xl shadow-2xl border border-cyan-400/30 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-400 via-purple-600 to-pink-500 animate-pulse"></div>
+          <div className="text-6xl mb-6 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]">🎉</div>
+          <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400 mb-2 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">VICTORY!</h2>
+          <p className="text-cyan-100/80 mb-8">Outstanding performance, <span className="font-bold text-cyan-300 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{playerName}</span>!</p>
+          <div className="bg-gradient-to-br from-cyan-900/30 to-purple-900/30 rounded-2xl p-6 mb-8 border border-cyan-400/30 backdrop-blur-sm">
             <div className="grid grid-cols-3 gap-4">
-              <div><span className="block text-xs font-bold text-emerald-600 uppercase">Moves</span><span className="block text-3xl font-black text-emerald-800">{moveCount}</span></div>
-              <div><span className="block text-xs font-bold text-emerald-600 uppercase">Optimal</span><span className="block text-3xl font-black text-emerald-800">{optimalMoves}</span></div>
-              <div><span className="block text-xs font-bold text-emerald-600 uppercase">Time</span><span className="block text-3xl font-black text-emerald-800">{formatTime(timeElapsed)}</span></div>
+              <div>
+                <span className="block text-xs font-bold text-cyan-400/70 uppercase drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">Moves</span>
+                <span className="block text-3xl font-black text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">{moveCount}</span>
+              </div>
+              <div>
+                <span className="block text-xs font-bold text-pink-400/70 uppercase drop-shadow-[0_0_3px_rgba(255,0,110,0.3)]">Optimal</span>
+                <span className="block text-3xl font-black text-pink-400 drop-shadow-[0_0_10px_rgba(255,0,110,0.6)]">{optimalMoves}</span>
+              </div>
+              <div>
+                <span className="block text-xs font-bold text-purple-400/70 uppercase drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">Time</span>
+                <span className="block text-3xl font-black text-purple-400 drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]">{formatTime(timeElapsed)}</span>
+              </div>
             </div>
           </div>
-          <button onClick={startNewRound} className="w-full py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-black hover:scale-[1.02] transition-all shadow-xl">Play Again</button>
+          <button onClick={startNewRound} className="w-full py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-900 font-black rounded-xl hover:shadow-[0_0_30px_rgba(0,255,221,0.8)] hover:scale-105 transition-all shadow-xl border border-cyan-400/50 uppercase tracking-widest">NEW CHALLENGE</button>
         </div>
       </div>
       
       {/* Show history even after winning */}
-      <div className="w-full lg:w-80 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col">
-        <div className="p-4 border-b border-gray-100 bg-emerald-50">
-          <h3 className="text-lg font-bold text-emerald-800">Your Full Sequence</h3>
+      <div className="w-full lg:w-80 bg-gradient-to-br from-slate-800 to-purple-900 rounded-3xl shadow-xl border border-cyan-400/30 backdrop-blur-sm flex flex-col">
+        <div className="p-4 border-b border-purple-600/30 bg-gradient-to-r from-slate-800/50 to-purple-900/50">
+          <h3 className="text-lg font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">COMPLETE SEQUENCE</h3>
         </div>
         <div className="flex-1 p-4 space-y-3">
           {[...moveHistory].reverse().map((move) => (
-            <div key={move.moveNum} className="flex items-center gap-3 text-sm bg-white border border-gray-100 p-2 rounded-lg shadow-sm">
-              <span className="font-bold text-gray-400 w-6">#{move.moveNum}</span>
-              <span className="font-bold text-gray-700">Disk {move.disk}: {move.from} → {move.to}</span>
+            <div key={move.moveNum} className="flex items-center gap-3 text-sm bg-slate-700/50 border border-purple-600/30 p-2 rounded-lg shadow-sm backdrop-blur-sm">
+              <span className="font-bold text-purple-400/70 w-6 drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">#{move.moveNum}</span>
+              <span className="font-bold text-cyan-300">Disk {move.disk}: {move.from} → {move.to}</span>
             </div>
           ))}
         </div>
@@ -555,9 +581,13 @@ const TowerOfHanoiGame = () => {
 
   return (
     // Fixed UI layout: items-start + pt-12 to prevent jumping
-    <div className="w-full min-h-screen bg-slate-50 flex items-start justify-center p-4 pt-12 font-sans text-slate-800">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-start justify-center p-4 pt-12 font-mono text-cyan-100 relative overflow-hidden">
+      {/* Animated background grid */}
+      <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
+      <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(139,92,246,.1)_2px,rgba(139,92,246,.1)_4px)]"></div>
+      
       {showRules && <GameRulesModal onClose={() => setShowRules(false)} />}
-      <div className="w-full max-w-7xl animate-fade-in">
+      <div className="w-full max-w-7xl animate-fade-in relative z-10">
         {gameState === 'setup' && renderSetup()}
         {gameState === 'quiz' && renderQuiz()}
         {gameState === 'playing' && renderGame()}

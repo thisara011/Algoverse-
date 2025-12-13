@@ -5,39 +5,42 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Courier New', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a0a3e 50%, #0f0a2e 100%);
+  color: #00ff88;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'Courier New', monospace;
 }
 
 .App {
   min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a0a3e 50%, #0f0a2e 100%);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #1a0a3e;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #ff006e, #00ff88);
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(255, 0, 110, 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: linear-gradient(180deg, #ff0099, #00ffaa);
+  box-shadow: 0 0 15px rgba(255, 0, 153, 0.8);
 }
 
 /* Animation utilities */
@@ -49,6 +52,24 @@ code {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes neonGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(255, 0, 110, 0.8), 0 0 20px rgba(0, 255, 136, 0.4);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 0, 110, 1), 0 0 30px rgba(0, 255, 136, 0.6);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
   }
 }
 
