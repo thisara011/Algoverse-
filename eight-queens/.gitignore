@@ -1,0 +1,23 @@
+# Root ignore for the project
+
+# Node.js
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
