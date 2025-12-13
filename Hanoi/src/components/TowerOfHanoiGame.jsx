@@ -347,7 +347,8 @@ const TowerOfHanoiGame = () => {
           user_moves: moveCount,
           quiz_answer: parseInt(quizAnswer) || 0,
           is_quiz_correct: isQuizCorrect,
-          duration_seconds: timeElapsed
+          duration_seconds: timeElapsed,
+          game_status: 'completed'
         });
 
       if (error) throw error;
@@ -355,6 +356,31 @@ const TowerOfHanoiGame = () => {
     } catch (error) {
       console.error("Error saving game result:", error.message);
       alert("Could not save your score. Check the console.");
+    }
+  };
+
+  const handleGiveUp = async () => {
+    setGameState('failed');
+
+    try {
+      const { error } = await supabase
+        .from('game_players')
+        .insert({
+          player_name: playerName,
+          disks: n,
+          pegs: m,
+          user_moves: moveCount,
+          quiz_answer: parseInt(quizAnswer) || 0,
+          is_quiz_correct: false,
+          duration_seconds: timeElapsed,
+          game_status: 'failed'
+        });
+
+      if (error) throw error;
+      
+    } catch (error) {
+      console.error("Error saving failed game result:", error.message);
+      alert("Could not save your attempt. Check the console.");
     }
   };
 
@@ -445,11 +471,18 @@ const TowerOfHanoiGame = () => {
               <span className="text-3xl font-black text-purple-400 tabular-nums drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]">{formatTime(timeElapsed)}</span>
             </div>
           </div>
-          <button onClick={() => setShowRules(true)} className="absolute right-0 top-1/2 -translate-y-1/2 p-3 bg-gradient-to-br from-slate-800 to-purple-900 hover:shadow-[0_0_20px_rgba(0,255,221,0.6)] text-cyan-400 hover:text-cyan-300 rounded-2xl border border-cyan-400/30 transition-all drop-shadow-[0_0_10px_rgba(0,255,221,0.3)]">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-          </button>
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <button onClick={() => setShowRules(true)} className="p-3 bg-gradient-to-br from-slate-800 to-purple-900 hover:shadow-[0_0_20px_rgba(0,255,221,0.6)] text-cyan-400 hover:text-cyan-300 rounded-2xl border border-cyan-400/30 transition-all drop-shadow-[0_0_10px_rgba(0,255,221,0.3)]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </button>
+            <button onClick={handleGiveUp} className="p-3 bg-gradient-to-br from-slate-800 to-purple-900 hover:shadow-[0_0_20px_rgba(255,0,110,0.6)] text-red-400 hover:text-red-300 rounded-2xl border border-red-400/30 transition-all drop-shadow-[0_0_10px_rgba(255,0,110,0.3)]" title="Give up and submit incomplete sequence">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
         
         {/* Game Area */}
@@ -579,6 +612,58 @@ const TowerOfHanoiGame = () => {
     </div>
   );
 
+  const renderFailed = () => (
+    <div className="w-full flex flex-col lg:flex-row gap-8 items-center justify-center max-w-6xl mx-auto">
+      <div className="text-center w-full max-w-lg">
+        <div className="bg-gradient-to-br from-slate-900 to-purple-900 p-10 rounded-3xl shadow-2xl border border-red-400/30 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-red-600 to-red-700 animate-pulse"></div>
+          <div className="text-6xl mb-6 drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]">⚠️</div>
+          <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-500 mb-2 drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]">INCOMPLETE</h2>
+          <p className="text-cyan-100/80 mb-8">Challenge submitted, <span className="font-bold text-cyan-300 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">{playerName}</span>!</p>
+          <div className="bg-gradient-to-br from-red-900/30 to-purple-900/30 rounded-2xl p-6 mb-8 border border-red-400/30 backdrop-blur-sm">
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <span className="block text-xs font-bold text-cyan-400/70 uppercase drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">Moves</span>
+                <span className="block text-3xl font-black text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)]">{moveCount}</span>
+              </div>
+              <div>
+                <span className="block text-xs font-bold text-pink-400/70 uppercase drop-shadow-[0_0_3px_rgba(255,0,110,0.3)]">Target</span>
+                <span className="block text-3xl font-black text-pink-400 drop-shadow-[0_0_10px_rgba(255,0,110,0.6)]">{optimalMoves}</span>
+              </div>
+              <div>
+                <span className="block text-xs font-bold text-purple-400/70 uppercase drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">Time</span>
+                <span className="block text-3xl font-black text-purple-400 drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]">{formatTime(timeElapsed)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-8 backdrop-blur-sm">
+            <p className="text-red-300 font-semibold">You were <span className="text-cyan-400">{optimalMoves - moveCount}</span> moves away from the optimal solution.</p>
+          </div>
+          <button onClick={startNewRound} className="w-full py-4 bg-gradient-to-r from-red-500 to-red-600 text-slate-900 font-black rounded-xl hover:shadow-[0_0_30px_rgba(255,0,0,0.8)] hover:scale-105 transition-all shadow-xl border border-red-400/50 uppercase tracking-widest">TRY AGAIN</button>
+        </div>
+      </div>
+      
+      {/* Show incomplete sequence */}
+      <div className="w-full lg:w-80 bg-gradient-to-br from-slate-800 to-purple-900 rounded-3xl shadow-xl border border-red-400/30 backdrop-blur-sm flex flex-col">
+        <div className="p-4 border-b border-purple-600/30 bg-gradient-to-r from-slate-800/50 to-purple-900/50">
+          <h3 className="text-lg font-bold text-red-400 drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]">ATTEMPTED SEQUENCE</h3>
+        </div>
+        <div className="flex-1 p-4 space-y-3">
+          {moveHistory.length === 0 ? (
+            <p className="text-center text-purple-400/60 italic mt-4">No moves recorded</p>
+          ) : (
+            [...moveHistory].reverse().map((move) => (
+              <div key={move.moveNum} className="flex items-center gap-3 text-sm bg-slate-700/50 border border-red-600/30 p-2 rounded-lg shadow-sm backdrop-blur-sm">
+                <span className="font-bold text-purple-400/70 w-6 drop-shadow-[0_0_3px_rgba(139,92,246,0.3)]">#{move.moveNum}</span>
+                <span className="font-bold text-cyan-300">Disk {move.disk}: {move.from} → {move.to}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     // Fixed UI layout: items-start + pt-12 to prevent jumping
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-start justify-center p-4 pt-12 font-mono text-cyan-100 relative overflow-hidden">
@@ -592,6 +677,7 @@ const TowerOfHanoiGame = () => {
         {gameState === 'quiz' && renderQuiz()}
         {gameState === 'playing' && renderGame()}
         {gameState === 'won' && renderWon()}
+        {gameState === 'failed' && renderFailed()}
       </div>
     </div>
   );
