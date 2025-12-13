@@ -24,13 +24,13 @@ export default function Leaderboard() {
   }, [])
 
   return (
-    <div style={{ padding: '40px', background: '#2c1810', color: 'white', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Global Leaderboard</h1>
+    <div style={{ padding: '40px', background: 'linear-gradient(180deg,#05020a 0%, #0b0420 70%)', color: '#e6f7ff', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', background: 'linear-gradient(90deg,#ff00ff,#00e5ff)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Global Leaderboard</h1>
       
       {loading ? (
         <p style={{ textAlign: 'center' }}>Loading scores...</p>
       ) : (
-        <table style={{ width: '90%', maxWidth: '800px', margin: 'auto', borderCollapse: 'collapse', boxShadow: '0 0 20px rgba(0,0,0,0.5)' }}>
+        <table style={{ width: '90%', maxWidth: '800px', margin: 'auto', borderCollapse: 'collapse', boxShadow: '0 10px 40px rgba(0,0,0,0.6)', background: 'rgba(6,4,18,0.6)', borderRadius: '10px', overflow: 'hidden' }}>
           <thead>
             <tr style={{ background: '#3d2817' }}>
               <th style={thStyle}>Rank</th>
@@ -45,7 +45,7 @@ export default function Leaderboard() {
           <tbody>
             {records.length > 0 ? (
               records.map((r, i) => (
-                <tr key={r.id || i} style={{ background: i % 2 === 0 ? '#4a341f' : '#5d4037' }}>
+                <tr key={r.id || i} style={{ background: i % 2 === 0 ? 'rgba(12,8,24,0.55)' : 'rgba(10,6,20,0.45)' }}>
                   <td style={tdStyle}>{i + 1}</td>
                   <td style={tdStyle}>{r.player_name || 'Anonymous'}</td>
                   <td style={tdStyle}>{r.board_size}×{r.board_size}</td>
@@ -72,7 +72,7 @@ export default function Leaderboard() {
       <p style={{ textAlign: 'center', marginTop: '30px' }}>
         <button 
           onClick={() => navigate('/')} 
-          style={{ background: 'none', border: 'none', color: '#ffeb8b', fontSize: '1.2rem', cursor: 'pointer', borderBottom: '1px dashed #ffeb8b' }}
+          style={{ background: 'transparent', border: '1px solid rgba(255,0,255,0.12)', color: '#ffd2ff', fontSize: '1.05rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px' }}
         >
           ← Back to Home
         </button>
@@ -81,5 +81,5 @@ export default function Leaderboard() {
   )
 }
 
-const thStyle = { padding: '15px', border: '1px solid #2c1810', textAlign: 'center', background: '#2c1810' }
-const tdStyle = { padding: '12px', textAlign: 'center', border: '1px solid #2c1810' }
+const thStyle = { padding: '15px', border: '1px solid rgba(255,255,255,0.03)', textAlign: 'center', background: 'linear-gradient(90deg, rgba(255,0,255,0.05), rgba(0,229,255,0.03))', color: '#e6f7ff' }
+const tdStyle = { padding: '12px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.02)', color: '#dff6ff' }
