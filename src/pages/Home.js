@@ -31,26 +31,26 @@ export default function Home() {
       fontFamily: 'Arial, sans-serif',
       textAlign: 'center',
       padding: '50px',
-      background: 'radial-gradient(ellipse at top left, #120022 0%, #05020a 60%)',
-      color: '#e6f7ff',
+      background: 'linear-gradient(#4a2c0d, #2c1810)',
+      color: 'white',
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center'
     }}>
-      <h1 style={{ fontSize: '3rem', marginBottom: '20px', background: 'linear-gradient(90deg,#ff00ff,#00e5ff)', WebkitBackgroundClip: 'text', color: 'transparent', textShadow: '0 2px 8px rgba(0,229,255,0.12)' }}>Snakes & Ladders</h1>
+      <h1 style={{ fontSize: '3rem', marginBottom: '20px', textShadow: '2px 2px 4px black' }}>Snakes & Ladders</h1>
       
       <div style={{
         maxWidth: '400px',
         width: '100%',
         margin: 'auto',
-        background: 'linear-gradient(180deg, rgba(10,6,20,0.85), rgba(5,3,10,0.6))',
+        background: '#3d2817',
         padding: '40px',
-        borderRadius: '14px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.7), 0 0 24px rgba(0,229,255,0.06) inset',
-        border: '1px solid rgba(0,229,255,0.12)'
+        borderRadius: '20px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
+        border: '1px solid #5d4037'
       }}>
-        <h3 style={{ margin: '0 0 20px 0', color: '#ffd2ff' }}>Enter Game Details</h3>
+        <h3 style={{ margin: '0 0 20px 0', color: '#ffeb8b' }}>Enter Game Details</h3>
         
         {/* Name Input */}
         <div style={{ textAlign: 'left', marginBottom: '15px' }}>
@@ -86,7 +86,7 @@ export default function Home() {
       </div>
 
       <p style={{ marginTop: '30px' }}>
-        <a href="/leaderboard" style={{ color: '#ff85ff', textDecoration: 'none', fontSize: '1.2rem', borderBottom: '1px dashed rgba(255,133,255,0.6)' }}>
+        <a href="/leaderboard" style={{ color: '#ffeb8b', textDecoration: 'none', fontSize: '1.2rem', borderBottom: '1px dashed #ffeb8b' }}>
           View Leaderboard →
         </a>
       </p>
@@ -98,12 +98,9 @@ const inputStyle = {
   width: '100%', 
   padding: '12px', 
   borderRadius: '8px', 
-  border: '1px solid rgba(255,0,255,0.12)', 
+  border: 'none', 
   boxSizing: 'border-box',
-  fontSize: '1rem',
-  background: 'rgba(5,3,12,0.6)',
-  color: '#e6f7ff',
-  outline: 'none'
+  fontSize: '1rem'
 }
 
 const buttonStyle = { 
@@ -112,9 +109,9 @@ const buttonStyle = {
   marginTop: '10px', 
   borderRadius: '8px', 
   border: 'none', 
-  background: 'linear-gradient(90deg,#ff00ff,#00e5ff)', 
-  color: '#03020a', 
+  background: '#8d5524', 
+  color: 'white', 
   fontSize: '1.1rem', 
   cursor: 'pointer',
-  boxShadow: '0 8px 30px rgba(0,229,255,0.12), 0 2px 8px rgba(255,0,255,0.06)'
+  transition: 'background 0.2s'
 }

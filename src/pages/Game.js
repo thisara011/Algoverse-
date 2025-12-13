@@ -106,28 +106,28 @@ export default function Game() {
   return (
     <div style={{ 
       display: 'flex', flexDirection: 'column', alignItems: 'center', 
-      minHeight: '100vh', background: 'linear-gradient(180deg, #06020b 0%, #120022 60%)', color: '#e6f7ff', padding: '20px' 
+      minHeight: '100vh', background: '#2c1810', color: 'white', padding: '20px' 
     }}>
       {gameStage === 'won' && <Confetti />}
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '800px', marginBottom: '10px', alignItems: 'center' }}>
-        <h2 style={{ margin: 0, background: 'linear-gradient(90deg,#ff00ff,#00e5ff)', WebkitBackgroundClip: 'text', color: 'transparent' }}>{playerName} • Board</h2>
-        <div style={{ textAlign: 'right', color: '#cfefff' }}>
-          <p style={{ margin: 0, fontSize: '0.95rem' }}>Target: <strong style={{ color: '#fff' }}>{board.total}</strong></p>
-          <p style={{ margin: 0, fontSize: '0.95rem' }}>Current: <strong style={{ color: '#fff' }}>{playerPos}</strong></p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '800px', marginBottom: '10px' }}>
+        <h2>{playerName} vs The Board</h2>
+        <div style={{ textAlign: 'right' }}>
+          <p>Target: <strong>{board.total}</strong></p>
+          <p>Current: <strong>{playerPos}</strong></p>
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', justifyContent: 'center' }}>
         <Board N={N} snakes={board.snakes} ladders={board.ladders} playerPos={playerPos} />
         
-        <div style={{ width: '250px', background: 'linear-gradient(180deg, rgba(8,6,18,0.7), rgba(5,3,10,0.55))', padding: '20px', borderRadius: '12px', height: 'fit-content', border: '1px solid rgba(0,229,255,0.08)', boxShadow: '0 8px 30px rgba(0,0,0,0.6), 0 0 18px rgba(255,0,255,0.04) inset' }}>
+        <div style={{ width: '250px', background: '#3d2817', padding: '20px', borderRadius: '15px', height: 'fit-content', border: '1px solid #5d4037' }}>
           {gameStage === 'playing' || gameStage === 'won' ? (
             <>
               <Dice value={diceVal} rolling={isRolling} onRoll={handleRoll} />
-              <div style={{ marginTop: '20px', textAlign: 'left', background: 'rgba(4,4,8,0.45)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(0,229,255,0.06)' }}>
-                <p style={{ margin: '0 0 8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize:'0.8rem', color: '#cfefff' }}>Game Log:</p>
-                {log.map((l, i) => <p key={i} style={{ fontSize: '0.9rem', margin: '6px 0', opacity: i===0?1:0.75, color: '#e6f7ff' }}>{l}</p>)}
+              <div style={{ marginTop: '20px', textAlign: 'left', background: 'rgba(0,0,0,0.3)', padding: '10px', borderRadius: '5px' }}>
+                <p style={{ margin: '0 0 5px 0', borderBottom: '1px solid #aaa', fontSize:'0.8rem' }}>Game Log:</p>
+                {log.map((l, i) => <p key={i} style={{ fontSize: '0.9rem', margin: '4px 0', opacity: i===0?1:0.7 }}>{l}</p>)}
               </div>
               {gameStage === 'won' && <div style={{ marginTop: '20px', color: '#4CAF50', fontSize: '1.5rem', fontWeight: 'bold' }}>VICTORY!</div>}
             </>
@@ -135,7 +135,7 @@ export default function Game() {
              <p>Solving board...</p>
           )}
           <div style={{ marginTop: '30px' }}>
-             <button onClick={() => navigate('/')} style={{ width: '100%', padding: '10px', cursor: 'pointer', borderRadius:'6px', border:'1px solid rgba(255,0,255,0.12)', background: 'transparent', color: '#ffd2ff' }}>← Quit</button>
+             <button onClick={() => navigate('/')} style={{ width: '100%', padding: '10px', cursor: 'pointer', borderRadius:'5px', border:'none' }}>Quit Game</button>
           </div>
         </div>
       </div>
