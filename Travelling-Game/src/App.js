@@ -14,6 +14,7 @@ import {
     validateUserPath
 } from './lib/tsp';
 import { cityToIndex, generateDistanceMatrix, indexToCity } from './lib/utils';
+import { updatePlayerStats } from './utils/updateStats';
 
 const NUM_CITIES = 10;
 const CITIES = Array.from({ length: NUM_CITIES }, (_, i) => indexToCity(i));
@@ -183,6 +184,17 @@ function App() {
                 // Save to database only if correct
                 if (validation.isCorrect) {
                     saveGameResult(results, optimalDistance);
+                    // Update player stats in main hub
+                    const totalTime = (results.bruteForce?.timeTaken || 0) +
+                        (results.nearestNeighbor?.timeTaken || 0) +
+                        (results.dynamicProgramming?.timeTaken || 0);
+                    updatePlayerStats(playerName, true, totalTime);
+                } else {
+                    // Still update stats for played game (even if lost)
+                    const totalTime = (results.bruteForce?.timeTaken || 0) +
+                        (results.nearestNeighbor?.timeTaken || 0) +
+                        (results.dynamicProgramming?.timeTaken || 0);
+                    updatePlayerStats(playerName, false, totalTime);
                 }
             }
 

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { User, Trophy, Clock, Target, LogOut, X } from 'lucide-react';
+import { Clock, LogOut, Target, Trophy, User, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface UserProfileProps {
@@ -66,6 +66,8 @@ export function UserProfile({ user, onClose, onLogout }: UserProfileProps) {
           <button
             onClick={onClose}
             className="bg-gray-700 text-gray-300 p-2 rounded-lg hover:bg-gray-600 transition-colors"
+            aria-label="Close profile"
+            title="Close profile"
           >
             <X className="w-6 h-6" />
           </button>
@@ -126,15 +128,24 @@ export function UserProfile({ user, onClose, onLogout }: UserProfileProps) {
               <div className="space-y-3">
                 {[
                   { key: 'traffic', name: 'Traffic Simulation', color: 'blue' },
-                  { key: 'Snake', name: 'Sorting Race', color: 'purple' },
-                  { key: 'Traveling', name: 'Pathfinding Maze', color: 'green' },
-                  { key: 'Tower', name: 'Binary Tree Builder', color: 'orange' },
-                  { key: 'queens', name: 'Graph Coloring', color: 'yellow' },
+                  { key: 'Snake', name: 'Snake and Ladder', color: 'purple' },
+                  { key: 'Traveling', name: 'Traveling Salesman', color: 'green' },
+                  { key: 'Tower', name: 'Tower of Hanoi', color: 'orange' },
+                  { key: 'queens', name: 'Eight Queens Puzzle', color: 'yellow' },
                 ].map(game => {
                   const gameStats = stats?.gameStats[game.key as keyof typeof stats.gameStats];
                   const played = gameStats?.played || 0;
                   const won = gameStats?.won || 0;
                   const rate = played > 0 ? ((won / played) * 100).toFixed(0) : '0';
+
+                  // Color classes for Tailwind
+                  const colorClasses = {
+                    blue: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                    purple: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                    green: 'bg-green-500/20 text-green-400 border-green-500/30',
+                    orange: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+                    yellow: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                  };
 
                   return (
                     <div key={game.key} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
@@ -142,7 +153,7 @@ export function UserProfile({ user, onClose, onLogout }: UserProfileProps) {
                       <div className="flex items-center gap-4 text-sm">
                         <span className="text-gray-400">Played: <span className="text-white">{played}</span></span>
                         <span className="text-gray-400">Won: <span className="text-green-400">{won}</span></span>
-                        <span className={`px-3 py-1 rounded-full bg-${game.color}-500/20 text-${game.color}-400 border border-${game.color}-500/30`}>
+                        <span className={`px-3 py-1 rounded-full border ${colorClasses[game.color as keyof typeof colorClasses]}`}>
                           {rate}% win rate
                         </span>
                       </div>

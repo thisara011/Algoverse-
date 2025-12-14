@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import Chessboard from './Chessboard';
 import '../styles/Panel.css';
+import { updatePlayerStats } from '../utils/updateStats';
+import Chessboard from './Chessboard';
 
 const QueenSolver = {
   isValidSolution(boardStr) {
@@ -88,10 +89,14 @@ export default function SubmitPanel({ onSubmit }) {
       const data = await res.json();
       if (data.correct) {
         setMessage({ text: data.message, type: 'success' });
+        // Update player stats in main hub
+        updatePlayerStats(playerName, true, 0); // Time not tracked in this game
         clearBoard();
         onSubmit();
       } else {
         setMessage({ text: data.message || data.error, type: 'error' });
+        // Update player stats (incorrect submission)
+        updatePlayerStats(playerName, false, 0);
       }
     } catch (error) {
       setMessage({ text: 'Error: ' + error.message, type: 'error' });

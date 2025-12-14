@@ -193,16 +193,39 @@ app.get('/make-server-2f7c4d80/user-stats', async c => {
 app.post('/make-server-2f7c4d80/update-stats', async c => {
   try {
     const body = await c.req.json();
-    const { userId, gameType, won, timeTaken } = body;
+    const { userId, playerName, gameType, won, timeTaken } = body;
 
-    if (!userId || !gameType) {
-      return c.json({ error: 'User ID and game type are required' }, 400);
+    if (!gameType) {
+      return c.json({ error: 'Game type is required' }, 400);
     }
 
-    const user = await kv.get(userId);
+    // Find user by userId or playerName
+    let user = null;
+    if (userId) {
+      user = await kv.get(userId);
+    } else if (playerName) {
+      // Search for user by username
+      const allUsers = await kv.getByPrefix('user_');
+      if (allUsers && Array.isArray(allUsers)) {
+        user = allUsers.find(u => u && u.value && u.value.username &&
+          u.value.username.toLowerCase() === playerName.trim().toLowerCase())?.value;
+      }
+    }
 
     if (!user) {
-      return c.json({ error: 'User not found' }, 404);
+      // If user not found, silently fail (game can still save to its own table)
+      console.log(`User not found for stats update: userId=${userId}, playerName=${playerName}`);
+      return c.json({ success: false, message: 'User not found' }, 200);
+    }
+
+    // Get userId from user object if we found user by name
+    let actualUserId = userId;
+    if (!actualUserId && playerName && allUsers && Array.isArray(allUsers)) {
+      const found = allUsers.find(u => u && u.value && u.value.username &&
+        u.value.username.toLowerCase() === playerName.trim().toLowerCase());
+      if (found) {
+        actualUserId = found.key;
+      }
     }
 
     // Update stats
@@ -212,10 +235,10 @@ app.post('/make-server-2f7c4d80/update-stats', async c => {
       totalTime: 0,
       gameStats: {
         traffic: { played: 0, won: 0 },
-        sorting: { played: 0, won: 0 },
-        pathfinding: { played: 0, won: 0 },
-        binarytree: { played: 0, won: 0 },
-        graphcoloring: { played: 0, won: 0 },
+        Snake: { played: 0, won: 0 },
+        Traveling: { played: 0, won: 0 },
+        Tower: { played: 0, won: 0 },
+        queens: { played: 0, won: 0 },
       },
     };
 
@@ -228,9 +251,9 @@ app.post('/make-server-2f7c4d80/update-stats', async c => {
       if (won) stats.gameStats[gameType].won += 1;
     }
 
-    await kv.set(userId, { ...user, stats });
+    await kv.set(actualUserId, { ...user, stats });
 
-    console.log(`Stats updated for user ${userId}: ${gameType} - ${won ? 'won' : 'lost'}`);
+    console.log(`Stats updated for user ${actualUserId}: ${gameType} - ${won ? 'won' : 'lost'}`);
     return c.json({ success: true, stats });
   } catch (error) {
     console.error('Error updating user stats:', error);

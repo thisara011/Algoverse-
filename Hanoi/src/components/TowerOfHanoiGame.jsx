@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient.js';
-import { runAndLogSolvers, getOptimalMoves } from '../utils/hanoiSolvers.js';
+import { getOptimalMoves, runAndLogSolvers } from '../utils/hanoiSolvers.js';
 
 // --- Utility Functions ---
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -10,12 +10,12 @@ const pegNames = ['A', 'B', 'C', 'D'];
 
 // Renders a single disk
 const Disk = ({ disk, color }) => {
-  const width = 40 + disk * 18; 
+  const width = 40 + disk * 18;
   return (
     <div
       className="h-7 rounded-lg border-2 relative overflow-hidden transition-all duration-300 shadow-lg"
-      style={{ 
-        width: `${width}px`, 
+      style={{
+        width: `${width}px`,
         backgroundColor: color,
         boxShadow: `0 0 15px ${color}, inset 0 0 10px rgba(255,255,255,0.3)`,
         borderColor: 'rgba(255, 255, 255, 0.6)'
@@ -47,14 +47,14 @@ const Peg = ({ name, disks, onPegClick, isSelected }) => {
   return (
     <div className="group flex flex-col items-center justify-end w-32 sm:w-40 h-80 transition-transform duration-200">
       {/* Peg Interaction Area */}
-      <div 
+      <div
         className={`relative flex flex-col-reverse items-center justify-start w-full h-full cursor-pointer transition-all duration-300 rounded-xl p-2 backdrop-blur-sm
           ${isSelected ? 'bg-cyan-500/20 scale-105 border border-cyan-400/50' : 'hover:bg-purple-500/10 border border-transparent'}
         `}
         onClick={() => onPegClick && onPegClick(name)}
       >
         {/* The Pole - Neon Glow */}
-        <div 
+        <div
           className={`absolute bottom-0 w-4 h-[90%] rounded-t-lg transition-all duration-300
             ${isSelected ? 'bg-cyan-400 shadow-[0_0_20px_rgba(0,255,221,0.8)]' : 'bg-purple-600/80 shadow-[0_0_15px_rgba(139,92,246,0.6)]'}
           `}
@@ -69,14 +69,14 @@ const Peg = ({ name, disks, onPegClick, isSelected }) => {
       </div>
 
       {/* Peg Base */}
-      <div 
+      <div
         className={`w-28 sm:w-32 h-4 rounded-full mt-1 transition-all duration-300
            ${isSelected ? 'bg-cyan-400 shadow-[0_0_15px_rgba(0,255,221,0.8)]' : 'bg-purple-600/70 shadow-[0_0_10px_rgba(139,92,246,0.5)]'}
         `}
       ></div>
-      
+
       {/* Label */}
-      <span 
+      <span
         className={`mt-3 text-2xl font-black transition-all duration-300 tracking-widest
           ${isSelected ? 'text-cyan-400 scale-110 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]' : 'text-purple-400 group-hover:text-cyan-300 drop-shadow-[0_0_5px_rgba(139,92,246,0.6)]'}
         `}
@@ -137,7 +137,7 @@ const GameRulesModal = ({ onClose }) => (
         <div className="mt-8 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 p-6 rounded-2xl border border-cyan-400/30 backdrop-blur-sm">
           <h4 className="font-bold text-cyan-300 mb-2 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(0,255,221,0.5)]"><span>🎮</span> CONTROLS</h4>
           <p className="text-cyan-100/80 text-sm">
-            <strong>Tap/Click</strong> a peg to pick up the top disk and another to drop it. 
+            <strong>Tap/Click</strong> a peg to pick up the top disk and another to drop it.
             <strong className="text-cyan-300"> OR</strong> use the Manual Move controls to select Source and Destination from the dropdowns.
           </p>
         </div>
@@ -157,16 +157,16 @@ const TowerOfHanoiGame = () => {
   const [n, setN] = useState(0); // Number of disks
   const [m, setM] = useState(0); // Number of pegs
   const [showRules, setShowRules] = useState(false);
-  
+
   // Game state
-  const [pegs, setPegs] = useState({}); 
+  const [pegs, setPegs] = useState({});
   const [selectedPeg, setSelectedPeg] = useState(null);
   const [moveCount, setMoveCount] = useState(0);
   const [moveHistory, setMoveHistory] = useState([]); // Stores { moveNum, disk, from, to }
-  
+
   // Timer state
   const [timeElapsed, setTimeElapsed] = useState(0);
-  
+
   // Manual Move Form State
   const [manualSource, setManualSource] = useState('A');
   const [manualDest, setManualDest] = useState('B');
@@ -201,9 +201,9 @@ const TowerOfHanoiGame = () => {
   }, []);
 
   const startNewRound = () => {
-    const newN = getRandomInt(5, 10); 
+    const newN = getRandomInt(5, 10);
     setN(newN);
-    setM(0); 
+    setM(0);
     setGameState('setup');
     setPlayerName('');
     setQuizAnswer('');
@@ -217,9 +217,9 @@ const TowerOfHanoiGame = () => {
   const selectPegs = (numPegs) => {
     setM(numPegs);
     setGameState('quiz');
-    
-    const destPeg = pegNames[numPegs - 1]; 
-    const auxPegs = pegNames.slice(1, numPegs - 1); 
+
+    const destPeg = pegNames[numPegs - 1];
+    const auxPegs = pegNames.slice(1, numPegs - 1);
 
     const optimal = getOptimalMoves(n, numPegs);
     setOptimalMoves(optimal);
@@ -242,7 +242,7 @@ const TowerOfHanoiGame = () => {
       initialPegs[pegNames[i]] = [];
     }
     initialPegs['A'] = Array.from({ length: n }, (_, i) => n - i);
-    
+
     setPegs(initialPegs);
     setGameState('playing');
   };
@@ -272,7 +272,7 @@ const TowerOfHanoiGame = () => {
 
       setPegs(newPegs);
       setMoveCount(prev => prev + 1);
-      
+
       // Update History
       const newMove = {
         moveNum: moveCount + 1,
@@ -283,8 +283,8 @@ const TowerOfHanoiGame = () => {
       setMoveHistory(prev => [...prev, newMove]);
 
       // Check Win
-      const destPeg = pegNames[m - 1]; 
-      if (newPegs[destPeg]?.length === n) { 
+      const destPeg = pegNames[m - 1];
+      if (newPegs[destPeg]?.length === n) {
         handleWin();
       }
       return true; // Success
@@ -304,7 +304,7 @@ const TowerOfHanoiGame = () => {
       if (pegs[pegName].length > 0) {
         setSelectedPeg(pegName);
         // Auto-set the manual dropdowns to match click for better UX
-        setManualSource(pegName); 
+        setManualSource(pegName);
       }
     } else {
       // Select Destination
@@ -325,7 +325,7 @@ const TowerOfHanoiGame = () => {
   const handleManualMove = (e) => {
     e.preventDefault();
     if (gameState !== 'playing') return;
-    
+
     if (manualSource === manualDest) {
       alert("Source and Destination cannot be the same.");
       return;
@@ -352,7 +352,11 @@ const TowerOfHanoiGame = () => {
         });
 
       if (error) throw error;
-      
+
+      // Update player stats in main hub
+      const { updatePlayerStats } = await import('../utils/updateStats');
+      updatePlayerStats(playerName, true, timeElapsed * 1000); // Convert to milliseconds
+
     } catch (error) {
       console.error("Error saving game result:", error.message);
       alert("Could not save your score. Check the console.");
@@ -377,7 +381,11 @@ const TowerOfHanoiGame = () => {
         });
 
       if (error) throw error;
-      
+
+      // Update player stats in main hub (lost)
+      const { updatePlayerStats } = await import('../utils/updateStats');
+      updatePlayerStats(playerName, false, timeElapsed * 1000); // Convert to milliseconds
+
     } catch (error) {
       console.error("Error saving failed game result:", error.message);
       alert("Could not save your attempt. Check the console.");
@@ -450,7 +458,7 @@ const TowerOfHanoiGame = () => {
 
   const renderGame = () => (
     <div className="w-full flex flex-col lg:flex-row gap-8 items-start justify-center h-full max-w-7xl mx-auto">
-      
+
       {/* LEFT: Game Board */}
       <div className="flex-1 w-full flex flex-col items-center">
         {/* Stats Bar */}
@@ -484,13 +492,13 @@ const TowerOfHanoiGame = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Game Area */}
         <div className="relative w-full flex justify-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-pink-600/20 rounded-full blur-3xl -z-10 animate-pulse"></div>
           <div className="flex justify-center items-end gap-4 sm:gap-12 p-8 sm:p-12 bg-gradient-to-br from-slate-800/40 to-purple-900/40 backdrop-blur-xl rounded-[3rem] shadow-2xl border border-cyan-400/20 min-h-[400px]">
             {Object.keys(pegs).map((pegName) => (
-              <Peg 
+              <Peg
                 key={pegName}
                 name={pegName}
                 disks={pegs[pegName]}
@@ -513,8 +521,8 @@ const TowerOfHanoiGame = () => {
             <div className="flex gap-2">
               <div className="flex-1">
                 <label className="text-xs font-bold text-cyan-400/70 uppercase ml-1 drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">From</label>
-                <select 
-                  value={manualSource} 
+                <select
+                  value={manualSource}
                   onChange={(e) => setManualSource(e.target.value)}
                   className="w-full p-2 bg-slate-700/50 border border-cyan-400/40 rounded-xl font-bold text-cyan-100 focus:ring-2 focus:ring-cyan-400 outline-none backdrop-blur-sm"
                 >
@@ -524,8 +532,8 @@ const TowerOfHanoiGame = () => {
               <div className="flex items-end pb-2 text-purple-400 font-bold">→</div>
               <div className="flex-1">
                 <label className="text-xs font-bold text-cyan-400/70 uppercase ml-1 drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">To</label>
-                <select 
-                  value={manualDest} 
+                <select
+                  value={manualDest}
                   onChange={(e) => setManualDest(e.target.value)}
                   className="w-full p-2 bg-slate-700/50 border border-cyan-400/40 rounded-xl font-bold text-cyan-100 focus:ring-2 focus:ring-cyan-400 outline-none backdrop-blur-sm"
                 >
@@ -594,7 +602,7 @@ const TowerOfHanoiGame = () => {
           <button onClick={startNewRound} className="w-full py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-900 font-black rounded-xl hover:shadow-[0_0_30px_rgba(0,255,221,0.8)] hover:scale-105 transition-all shadow-xl border border-cyan-400/50 uppercase tracking-widest">NEW CHALLENGE</button>
         </div>
       </div>
-      
+
       {/* Show history even after winning */}
       <div className="w-full lg:w-80 bg-gradient-to-br from-slate-800 to-purple-900 rounded-3xl shadow-xl border border-cyan-400/30 backdrop-blur-sm flex flex-col">
         <div className="p-4 border-b border-purple-600/30 bg-gradient-to-r from-slate-800/50 to-purple-900/50">
@@ -642,7 +650,7 @@ const TowerOfHanoiGame = () => {
           <button onClick={startNewRound} className="w-full py-4 bg-gradient-to-r from-red-500 to-red-600 text-slate-900 font-black rounded-xl hover:shadow-[0_0_30px_rgba(255,0,0,0.8)] hover:scale-105 transition-all shadow-xl border border-red-400/50 uppercase tracking-widest">TRY AGAIN</button>
         </div>
       </div>
-      
+
       {/* Show incomplete sequence */}
       <div className="w-full lg:w-80 bg-gradient-to-br from-slate-800 to-purple-900 rounded-3xl shadow-xl border border-red-400/30 backdrop-blur-sm flex flex-col">
         <div className="p-4 border-b border-purple-600/30 bg-gradient-to-r from-slate-800/50 to-purple-900/50">
@@ -670,7 +678,7 @@ const TowerOfHanoiGame = () => {
       {/* Animated background grid */}
       <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
       <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(139,92,246,.1)_2px,rgba(139,92,246,.1)_4px)]"></div>
-      
+
       {showRules && <GameRulesModal onClose={() => setShowRules(false)} />}
       <div className="w-full max-w-7xl animate-fade-in relative z-10">
         {gameState === 'setup' && renderSetup()}
