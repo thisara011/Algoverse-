@@ -49,7 +49,7 @@ export function GameIframe({ gameId, onBackToMenu }: GameIframeProps) {
   return (
     <div className="relative w-full h-screen bg-gray-900">
       {/* Header with Back Button */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-gray-900/90 backdrop-blur-lg border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+      <div className="absolute top-0 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-lg border-b border-gray-700 px-6 py-3 flex items-center justify-between h-16">
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToMenu}
@@ -131,7 +131,7 @@ export function GameIframe({ gameId, onBackToMenu }: GameIframeProps) {
         id={`game-iframe-${gameId}`}
         src={config.url}
         className="w-full h-full border-0"
-        style={{ marginTop: '64px', height: 'calc(100vh - 64px)' }}
+        style={{ marginTop: '64px', height: 'calc(100vh - 64px)', display: 'block' }}
         onLoad={handleLoad}
         onError={handleError}
         title={config.name}

@@ -461,8 +461,8 @@ const TowerOfHanoiGame = () => {
 
       {/* LEFT: Game Board */}
       <div className="flex-1 w-full flex flex-col items-center">
-        {/* Stats Bar */}
-        <div className="w-full max-w-2xl relative flex justify-center items-center mb-6">
+        {/* Stats Bar - Sticky to stay below header */}
+        <div className="w-full max-w-2xl relative flex justify-center items-center mb-6 z-10">
           <div className="flex items-center gap-8 bg-gradient-to-br from-slate-800 to-purple-900 px-10 py-4 rounded-full shadow-2xl shadow-cyan-500/30 border border-cyan-400/30 backdrop-blur-sm">
             <div className="flex flex-col items-center">
               <span className="text-[10px] font-bold text-cyan-400/70 uppercase tracking-widest drop-shadow-[0_0_3px_rgba(0,255,221,0.3)]">Moves</span>
@@ -673,8 +673,8 @@ const TowerOfHanoiGame = () => {
   );
 
   return (
-    // Fixed UI layout: items-start + pt-12 to prevent jumping
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-start justify-center p-4 pt-12 font-mono text-cyan-100 relative overflow-hidden">
+    // Fixed UI layout: items-start + pt-20 to account for iframe header
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-start justify-center p-4 pt-20 font-mono text-cyan-100 relative overflow-hidden">
       {/* Animated background grid */}
       <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
       <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(139,92,246,.1)_2px,rgba(139,92,246,.1)_4px)]"></div>

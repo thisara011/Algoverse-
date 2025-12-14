@@ -2,8 +2,8 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import './App.css';
-import CityMap from './components/CityMap';
 import CitySelector from './components/CitySelector';
+import DistanceMatrixTable from './components/DistanceMatrixTable';
 import PathBuilder from './components/PathBuilder';
 import ResultsTable from './components/ResultsTable';
 import { supabase } from './lib/supabaseClient';
@@ -299,7 +299,7 @@ function App() {
 
     return (
         <div className="app-layout">
-            <header className="header">
+            <header className="header" style={{ position: 'relative', zIndex: 10 }}>
                 <h1>Traveling Salesman Challenge</h1>
                 <p className="subtitle">Find the shortest route and beat the algorithms!</p>
             </header>
@@ -400,15 +400,13 @@ function App() {
 
                 {/* Right Panel: Visualization and Results */}
                 <div className="right-panel">
-                    {/* City Map */}
-                    <div className="card">
-                        <h3>City Network Visualization</h3>
-                        <CityMap
+                    {/* Distance Matrix Table */}
+                    <div className="card cyberpunk-card">
+                        <DistanceMatrixTable
                             cities={CITIES}
                             distanceMatrix={distanceMatrix}
                             homeCity={homeCity}
                             targetCities={selectedCities}
-                            playerPath={playerPath}
                             algorithmResults={algorithmResults}
                         />
                     </div>

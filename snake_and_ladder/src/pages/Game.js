@@ -114,11 +114,20 @@ export default function Game() {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      minHeight: '100vh', background: '#2c1810', color: 'white', padding: '20px'
+      minHeight: '100vh', background: '#2c1810', color: 'white',
+      padding: '20px', paddingTop: '84px' // Account for iframe header (64px) + margin
     }}>
       {gameStage === 'won' && <Confetti />}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '800px', marginBottom: '10px' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: '800px',
+        marginBottom: '10px',
+        position: 'relative',
+        zIndex: 10
+      }}>
         <h2>{playerName} vs The Board</h2>
         <div style={{ textAlign: 'right' }}>
           <p>Target: <strong>{board.total}</strong></p>

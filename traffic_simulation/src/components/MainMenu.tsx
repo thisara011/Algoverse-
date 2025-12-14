@@ -90,13 +90,6 @@ export function MainMenu({ onSelectGame, user, onShowProfile }: MainMenuProps) {
 
       <div className="mb-8 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
 
-      {/* Info Notice */}
-      <div className="mb-6 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 backdrop-blur-lg">
-        <p className="text-blue-300 text-sm text-center">
-          💡 <strong>Note:</strong> All games are now embedded in this app! Make sure all game servers are running (see <code className="bg-gray-800/50 px-2 py-1 rounded">start-all-games.bat</code>).
-        </p>
-      </div>
-
       {/* Game Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {games.map((game, index) => (
