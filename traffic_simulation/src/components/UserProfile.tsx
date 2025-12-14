@@ -14,10 +14,10 @@ interface UserStats {
   totalTime: number;
   gameStats: {
     traffic: { played: number; won: number };
-    sorting: { played: number; won: number };
-    pathfinding: { played: number; won: number };
-    binarytree: { played: number; won: number };
-    graphcoloring: { played: number; won: number };
+    Snake: { played: number; won: number };
+    Traveling: { played: number; won: number };
+    Tower: { played: number; won: number };
+    queens: { played: number; won: number };
   };
 }
 
@@ -126,10 +126,10 @@ export function UserProfile({ user, onClose, onLogout }: UserProfileProps) {
               <div className="space-y-3">
                 {[
                   { key: 'traffic', name: 'Traffic Simulation', color: 'blue' },
-                  { key: 'sorting', name: 'Sorting Race', color: 'purple' },
-                  { key: 'pathfinding', name: 'Pathfinding Maze', color: 'green' },
-                  { key: 'binarytree', name: 'Binary Tree Builder', color: 'orange' },
-                  { key: 'graphcoloring', name: 'Graph Coloring', color: 'yellow' },
+                  { key: 'Snake', name: 'Sorting Race', color: 'purple' },
+                  { key: 'Traveling', name: 'Pathfinding Maze', color: 'green' },
+                  { key: 'Tower', name: 'Binary Tree Builder', color: 'orange' },
+                  { key: 'queens', name: 'Graph Coloring', color: 'yellow' },
                 ].map(game => {
                   const gameStats = stats?.gameStats[game.key as keyof typeof stats.gameStats];
                   const played = gameStats?.played || 0;

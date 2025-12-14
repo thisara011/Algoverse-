@@ -1,8 +1,8 @@
+import { crypto } from 'https://deno.land/std@0.177.0/crypto/mod.ts';
 import { Hono } from 'npm:hono';
 import { cors } from 'npm:hono/cors';
 import { logger } from 'npm:hono/logger';
 import * as kv from './kv_store.tsx';
-import { crypto } from 'https://deno.land/std@0.177.0/crypto/mod.ts';
 
 const app = new Hono();
 
@@ -97,10 +97,10 @@ app.post('/make-server-2f7c4d80/register', async c => {
         totalTime: 0,
         gameStats: {
           traffic: { played: 0, won: 0 },
-          sorting: { played: 0, won: 0 },
-          pathfinding: { played: 0, won: 0 },
-          binarytree: { played: 0, won: 0 },
-          graphcoloring: { played: 0, won: 0 },
+          Snake: { played: 0, won: 0 },
+          Traveling: { played: 0, won: 0 },
+          Tower: { played: 0, won: 0 },
+          queens: { played: 0, won: 0 },
         },
       },
     });
@@ -150,10 +150,10 @@ app.post('/make-server-2f7c4d80/login', async c => {
     }
 
     console.log(`User logged in: ${user.value.username} (${user.value.email}) - ${user.key}`);
-    return c.json({ 
-      userId: user.key, 
+    return c.json({
+      userId: user.key,
       username: user.value.username,
-      email: user.value.email 
+      email: user.value.email
     });
   } catch (error) {
     console.error('Error logging in user:', error);
@@ -299,7 +299,7 @@ app.get('/make-server-2f7c4d80/leaderboard', async c => {
 
     // Filter out invalid entries and sort by timestamp
     const validResults = results.filter(r => r && r.value && r.value.timestamp);
-    
+
     const sortedResults = validResults
       .sort((a, b) => {
         const timeA = new Date(a.value.timestamp).getTime();

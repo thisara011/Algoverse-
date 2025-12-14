@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { TrafficSimulationGame } from './components/TrafficSimulationGame';
+import { useEffect, useState } from 'react';
 import { AnimatedBackground } from './components/AnimatedBackground';
-import { MainMenu } from './components/MainMenu';
-import { SortingRaceGame } from './components/SortingRaceGame';
-import { PathfindingMazeGame } from './components/PathfindingMazeGame';
 import { BinaryTreeGame } from './components/BinaryTreeGame';
 import { GraphColoringGame } from './components/GraphColoringGame';
+import { MainMenu } from './components/MainMenu';
+import { PathfindingMazeGame } from './components/PathfindingMazeGame';
+import { SortingRaceGame } from './components/SortingRaceGame';
+import { TrafficSimulationGame } from './components/TrafficSimulationGame';
 import { UserAuth } from './components/UserAuth';
 import { UserProfile } from './components/UserProfile';
 
-type GameType = 'menu' | 'traffic' | 'sorting' | 'pathfinding' | 'binarytree' | 'graphcoloring';
+type GameType = 'menu' | 'Traffic Simulation' | 'Snake and Ladder' | 'Traveling Salesman' | 'Tower of Hanoi ' | 'Eight queens puzzle ';
 
 export default function App() {
   const [currentGame, setCurrentGame] = useState<GameType>('menu');
