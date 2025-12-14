@@ -1,0 +1,116 @@
+/* src/App.css */
+
+.app-layout {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f7f9;
+    min-height: 100vh;
+}
+
+.header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2 parts for vis, 1 part for controls */
+    gap: 30px;
+}
+
+.main-visualization-panel {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.map-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    margin: 20px 0;
+}
+
+.map-container {
+    width: 100%;
+    max-width: 720px;
+    height: 520px;
+    background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+    border-radius: 8px;
+    box-shadow: 0 6px 14px rgba(20, 30, 40, 0.06);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Smaller devices */
+@media (max-width: 800px) {
+    .main-content { grid-template-columns: 1fr; }
+    .map-container { height: 420px; max-width: 100%; }
+}
+
+/* Typography and Highlighting */
+.highlight-text {
+    font-weight: bold;
+    color: #3498db;
+}
+
+.result-value {
+    font-weight: bold;
+    color: #27ae60;
+    font-size: 1.2em;
+}
+
+/* Buttons */
+.primary-button, .secondary-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.primary-button {
+    background-color: #3498db;
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+.secondary-button {
+    background-color: #bdc3c7;
+    color: #2c3e50;
+}
+
+.secondary-button:hover:not(:disabled) {
+    background-color: #95a5a6;
+}
+
+.primary-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
