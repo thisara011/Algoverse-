@@ -33,15 +33,6 @@ const CitySelector = ({
                     );
                 })}
             </div>
-            {selectedCities.length > 0 && (
-                <div className="selected-cities-display">
-                    <div className="selected-list">
-                        {selectedCities.map(city => (
-                            <span key={city} className="selected-city-tag">{city}</span>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

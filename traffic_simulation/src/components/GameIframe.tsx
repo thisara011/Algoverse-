@@ -18,6 +18,18 @@ export function GameIframe({ gameId, onBackToMenu }: GameIframeProps) {
     setHasError(false);
   }, [gameId]);
 
+  useEffect(() => {
+    // Listen for messages from iframe to navigate back
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'NAVIGATE_BACK') {
+        onBackToMenu();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onBackToMenu]);
+
   if (!config || !config.url) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -48,34 +60,6 @@ export function GameIframe({ gameId, onBackToMenu }: GameIframeProps) {
 
   return (
     <div className="relative w-full h-screen bg-gray-900">
-      {/* Header with Back Button */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-lg border-b border-gray-700 px-6 py-3 flex items-center justify-between h-16">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBackToMenu}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Menu
-          </button>
-          <h2 className="text-xl font-semibold text-white">{config.name}</h2>
-        </div>
-        <button
-          onClick={() => {
-            setIsLoading(true);
-            setHasError(false);
-            const iframe = document.getElementById(`game-iframe-${gameId}`) as HTMLIFrameElement;
-            if (iframe) {
-              iframe.src = iframe.src; // Reload iframe
-            }
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white transition-colors"
-          title="Reload Game"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
-
       {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-900">
@@ -126,12 +110,12 @@ export function GameIframe({ gameId, onBackToMenu }: GameIframeProps) {
         </div>
       )}
 
-      {/* Game Iframe */}
+      {/* Game Iframe - Full Screen */}
       <iframe
         id={`game-iframe-${gameId}`}
         src={config.url}
         className="w-full h-full border-0"
-        style={{ marginTop: '64px', height: 'calc(100vh - 64px)', display: 'block' }}
+        style={{ height: '100vh', display: 'block' }}
         onLoad={handleLoad}
         onError={handleError}
         title={config.name}

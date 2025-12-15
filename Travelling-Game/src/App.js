@@ -297,11 +297,35 @@ function App() {
         return <div className="loading-container">Loading New Game...</div>;
     }
 
+    // Handle back to menu
+    const handleBackToMenu = () => {
+        // Check if we're in an iframe
+        if (window.parent !== window) {
+            // Send message to parent to navigate back
+            window.parent.postMessage({ type: 'NAVIGATE_BACK' }, '*');
+        } else {
+            // If not in iframe, just go back in history
+            window.history.back();
+        }
+    };
+
     return (
         <div className="app-layout">
             <header className="header" style={{ position: 'relative', zIndex: 10 }}>
-                <h1>Traveling Salesman Challenge</h1>
-                <p className="subtitle">Find the shortest route and beat the algorithms!</p>
+                <div className="header-content">
+                    <div className="header-text">
+                        <h1>Traveling Salesman Challenge</h1>
+                        <p className="subtitle">Find the shortest route and beat the algorithms!</p>
+                    </div>
+                    <button
+                        onClick={handleBackToMenu}
+                        className="back-button"
+                        title="Back to Menu"
+                    >
+                        <span className="back-icon">←</span>
+                        <span>Back to Menu</span>
+                    </button>
+                </div>
             </header>
 
             {error && (
@@ -343,7 +367,7 @@ function App() {
                         />
                     </div>
 
-                    {/* Path Builder */}
+                    {/* Path Builder - Hidden initially, shown after city selection */}
                     {selectedCities.length > 0 && (
                         <div className="card">
                             <PathBuilder
@@ -398,7 +422,7 @@ function App() {
                     )}
                 </div>
 
-                {/* Right Panel: Visualization and Results */}
+                {/* Right Panel: Distance Matrix Only */}
                 <div className="right-panel">
                     {/* Distance Matrix Table */}
                     <div className="card cyberpunk-card">
@@ -411,7 +435,7 @@ function App() {
                         />
                     </div>
 
-                    {/* Algorithm Results */}
+                    {/* Algorithm Results - Show below matrix if available */}
                     {algorithmResults && (
                         <div className="card">
                             <ResultsTable
