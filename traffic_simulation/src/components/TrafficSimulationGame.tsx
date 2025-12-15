@@ -4,6 +4,7 @@ import { GameInput } from './GameInput';
 import { GameResult } from './GameResult';
 import { Leaderboard } from './Leaderboard';
 import { SystemStatus } from './SystemStatus';
+import { HowToPlay } from './HowToPlay';
 import { fordFulkerson, edmondsKarp } from '../utils/maxFlowAlgorithms';
 import { generateRandomGraph } from '../utils/graphGenerator';
 import type { Edge } from '../utils/graphGenerator';
@@ -221,7 +222,7 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative bg-black/80 backdrop-blur-lg rounded-2xl shadow-2xl border-2 border-cyan-500/50 p-8 shadow-cyan-500/20">
+      <div className="relative bg-black/80 backdrop-blur-lg rounded-lg shadow-2xl border-2 border-cyan-500/50 p-5 shadow-cyan-500/20">
         {/* Tech corners */}
         <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-cyan-400"></div>
         <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-cyan-400"></div>
@@ -229,22 +230,27 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-cyan-400"></div>
 
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-pulse">
-            TRAFFIC SIMULATION // MAX FLOW PROTOCOL
-          </h1>
-          <div className="flex gap-4">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2 tracking-wider">
+              TRAFFIC SIMULATION // MAX FLOW PROTOCOL
+            </h1>
+            <h2 className="text-cyan-400 text-sm tracking-wider font-mono">
+              | &gt;&gt; TRAFFIC NETWORK
+            </h2>
+          </div>
+          <div className="flex gap-3">
             <button
               onClick={() => setShowLeaderboard(!showLeaderboard)}
-              className="relative bg-gradient-to-r from-green-500 to-emerald-500 text-black px-6 py-2 rounded-lg hover:from-green-400 hover:to-emerald-400 transition-all shadow-lg shadow-green-500/50 hover:shadow-green-400/70 border border-green-300"
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-black px-4 py-2 rounded text-sm font-mono font-bold hover:from-green-400 hover:to-emerald-400 transition-all shadow-lg shadow-green-500/50 border border-green-300"
             >
-              <span className="relative z-10">{showLeaderboard ? '[ HIDE LEADERBOARD ]' : '[ SHOW LEADERBOARD ]'}</span>
+              {showLeaderboard ? '[ HIDE LEADERBOARD ]' : '[ SHOW LEADERBOARD ]'}
             </button>
             <button
               onClick={onBackToMenu}
-              className="relative bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-lg hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-500/50 hover:shadow-purple-400/70 border border-purple-400"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded text-sm font-mono font-bold hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-500/50 border border-purple-400"
             >
-              <span className="relative z-10">&lt;&lt; BACK TO ALGOVERSE</span>
+              &lt;&lt; BACK TO ALGOVERSE
             </button>
           </div>
         </div>
@@ -255,50 +261,51 @@ export function TrafficSimulationGame({ onBackToMenu, user }: TrafficSimulationG
           </div>
         )}
 
-        {/* Main Layout - Network Graph on Top, Controls at Bottom */}
-        <div className="space-y-6">
-          {/* Network Graph Section - Full Width */}
-          <div>
-            <h2 className="text-cyan-400 mb-4 tracking-wider border-l-4 border-cyan-400 pl-4 text-2xl">
-              &gt;&gt; TRAFFIC NETWORK
-            </h2>
-            <p className="text-gray-400 mb-6 font-mono text-sm">
-              [ OBJECTIVE ] Calculate maximum flow of vehicles per minute from source{' '}
-              <span className="text-cyan-400 font-bold">A</span> to sink{' '}
-              <span className="text-pink-400 font-bold">T</span>
-            </p>
-            <TrafficNetwork edges={gameState.edges} />
+        {/* Objective */}
+        <p className="text-gray-300 mb-4 font-mono text-xs">
+          [ OBJECTIVE ] Calculate maximum flow of vehicles per minute from source{' '}
+          <span className="text-cyan-400 font-bold">A</span> to sink{' '}
+          <span className="text-pink-400 font-bold">T</span>
+        </p>
+
+        {/* Network Graph Section */}
+        <div className="mb-6">
+          <TrafficNetwork edges={gameState.edges} />
+        </div>
+
+        {/* Bottom Control Panel - 3 Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* System Status Panel - Left */}
+          <div className="lg:col-span-1">
+            <SystemStatus
+              status={systemStatus.status}
+              lastRun={systemStatus.lastRun}
+              score={systemStatus.score}
+            />
           </div>
 
-          {/* Bottom Control Panel - Horizontal Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* System Status Panel */}
-            <div className="lg:col-span-1">
-              <SystemStatus
-                status={systemStatus.status}
-                lastRun={systemStatus.lastRun}
-                score={systemStatus.score}
+          {/* Game Input/Result Panel - Middle */}
+          <div className="lg:col-span-1">
+            {gameState.phase === 'input' && (
+              <GameInput onSubmit={handleSubmitAnswer} />
+            )}
+
+            {gameState.phase === 'result' && (
+              <GameResult
+                result={gameState.result!}
+                playerAnswer={gameState.playerAnswer!}
+                correctAnswer={gameState.correctAnswer!}
+                algorithm1Time={gameState.algorithm1Time}
+                algorithm2Time={gameState.algorithm2Time}
+                playerName={gameState.playerName}
+                onPlayAgain={handlePlayAgain}
               />
-            </div>
+            )}
+          </div>
 
-            {/* Game Input/Result Panel */}
-            <div className="lg:col-span-2">
-              {gameState.phase === 'input' && (
-                <GameInput onSubmit={handleSubmitAnswer} />
-              )}
-
-              {gameState.phase === 'result' && (
-                <GameResult
-                  result={gameState.result!}
-                  playerAnswer={gameState.playerAnswer!}
-                  correctAnswer={gameState.correctAnswer!}
-                  algorithm1Time={gameState.algorithm1Time}
-                  algorithm2Time={gameState.algorithm2Time}
-                  playerName={gameState.playerName}
-                  onPlayAgain={handlePlayAgain}
-                />
-              )}
-            </div>
+          {/* How To Play Panel - Right */}
+          <div className="lg:col-span-1">
+            {gameState.phase === 'input' && <HowToPlay />}
           </div>
         </div>
       </div>

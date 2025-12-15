@@ -1,7 +1,7 @@
 // src/components/CityMap.js
 
-import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { Stage, Layer, Circle, Text } from 'react-konva';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Circle, Layer, Stage, Text } from 'react-konva';
 import Edge from './Edge';
 
 // Responsive CityMap: computes positions based on container size

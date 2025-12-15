@@ -20,7 +20,7 @@ interface TrafficNetworkProps {
 
 export function TrafficNetwork({ edges }: TrafficNetworkProps) {
   return (
-    <div className="bg-black/90 rounded-xl p-8 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20 relative overflow-hidden">
+    <div className="bg-black/90 rounded-lg p-4 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20 relative overflow-hidden">
       {/* Grid background effect */}
       <div className="absolute inset-0 opacity-20">
         <div
@@ -35,7 +35,7 @@ export function TrafficNetwork({ edges }: TrafficNetworkProps) {
 
       <svg
         width="100%"
-        height="800"
+        height="520"
         viewBox="0 0 1400 800"
         className="relative z-10"
         preserveAspectRatio="xMidYMid meet"
