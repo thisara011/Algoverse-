@@ -189,6 +189,18 @@ const TowerOfHanoiGame = () => {
     return () => clearInterval(timer);
   }, [gameState]);
 
+  // Handle back to menu
+  const handleBackToMenu = () => {
+    // Check if we're in an iframe
+    if (window.parent !== window) {
+      // Send message to parent to navigate back
+      window.parent.postMessage({ type: 'NAVIGATE_BACK' }, '*');
+    } else {
+      // If not in iframe, just go back in history
+      window.history.back();
+    }
+  };
+
   // Format time (MM:SS)
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -399,9 +411,24 @@ const TowerOfHanoiGame = () => {
       <div className="bg-gradient-to-br from-slate-900 to-purple-900 p-10 rounded-3xl shadow-2xl border border-cyan-400/30 backdrop-blur-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-purple-600"></div>
         <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(0,255,221,.1)_2px,rgba(0,255,221,.1)_4px)]"></div>
-        <h2 className="text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)] relative z-10">
-          ⚔️ TOWER OF HANOI
-        </h2>
+        
+        {/* Header with Back Button and Title */}
+        <div className="flex items-center justify-between mb-8 relative z-10">
+          <button
+            onClick={handleBackToMenu}
+            className="flex items-center gap-2 px-4 py-2 bg-black/50 border-2 border-cyan-400 rounded-lg text-cyan-400 font-mono text-sm font-bold hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(0,255,221,0.5)] transition-all"
+          >
+            <span>←</span>
+            <span>Back to Menu</span>
+          </button>
+          
+          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 drop-shadow-[0_0_10px_rgba(0,255,221,0.6)] flex-1 text-center">
+            ⚔️ TOWER OF HANOI
+          </h2>
+          
+          {/* Spacer to balance the layout */}
+          <div className="w-[140px]"></div>
+        </div>
         <div className="mb-8 relative z-10">
           <p className="text-cyan-400/70 uppercase tracking-widest text-xs font-bold mb-2 drop-shadow-[0_0_5px_rgba(0,255,221,0.4)]">Current Challenge</p>
           <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 drop-shadow-[0_0_10px_rgba(0,255,221,0.8)]">{n} <span className="text-2xl font-medium text-purple-400">DISKS</span></div>

@@ -6,6 +6,18 @@ export default function Home() {
   const [size, setSize] = useState(8)
   const navigate = useNavigate()
 
+  // Handle back to menu
+  const handleBackToMenu = () => {
+    // Check if we're in an iframe
+    if (window.parent !== window) {
+      // Send message to parent to navigate back
+      window.parent.postMessage({ type: 'NAVIGATE_BACK' }, '*');
+    } else {
+      // If not in iframe, just go back in history
+      window.history.back();
+    }
+  };
+
   const handleStartGame = () => {
     // Basic validation
     if (!playerName.trim()) {
@@ -36,8 +48,48 @@ export default function Home() {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      position: 'relative'
     }}>
+      {/* Back Button */}
+      <button
+        onClick={handleBackToMenu}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 20px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: '2px solid #00ffff',
+          borderRadius: '8px',
+          color: '#00ffff',
+          fontFamily: 'Courier New, monospace',
+          fontSize: '0.9rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 0 10px rgba(0, 255, 255, 0.3)',
+          transition: 'all 0.3s',
+          zIndex: 10
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'rgba(0, 255, 255, 0.1)';
+          e.target.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.5)';
+          e.target.style.transform = 'translateX(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'rgba(0, 0, 0, 0.5)';
+          e.target.style.boxShadow = '0 0 10px rgba(0, 255, 255, 0.3)';
+          e.target.style.transform = 'translateX(0)';
+        }}
+      >
+        <span>←</span>
+        <span>Back to Menu</span>
+      </button>
+
       <h1 style={{ fontSize: '3rem', marginBottom: '20px', textShadow: '2px 2px 4px black' }}>Snakes & Ladders</h1>
       
       <div style={{
