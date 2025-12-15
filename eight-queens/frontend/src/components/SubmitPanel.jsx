@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import '../styles/Panel.css';
-import { updatePlayerStats } from '../utils/updateStats';
+import { updatePlayerStats } from '../utils/playerStats';
 import Chessboard from './Chessboard';
 
 const QueenSolver = {

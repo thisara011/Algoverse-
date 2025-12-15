@@ -1,3 +1,4 @@
+
 @echo off
 setlocal enabledelayedexpansion
 
@@ -98,12 +99,16 @@ start "Traveling Salesman - Port 3002" cmd /k "cd /d "%ROOT_DIR%Travelling-Game"
 timeout /t 3 /nobreak >nul
 
 REM Start Tower of Hanoi
-echo [4/5] Starting Tower of Hanoi on port 5174...
+echo [4/6] Starting Tower of Hanoi on port 5174...
 start "Tower of Hanoi - Port 5174" cmd /k "cd /d "%ROOT_DIR%Hanoi" && npm run dev"
 timeout /t 3 /nobreak >nul
 
 REM Start Eight Queens
-echo [5/5] Starting Eight Queens Frontend on port 5175...
+echo [5/6] Starting Eight Queens Backend on port 3001...
+start "Eight Queens Backend - Port 3001" cmd /k "cd /d "%ROOT_DIR%eight-queens\backend" && npm start"
+timeout /t 3 /nobreak >nul
+
+echo [6/6] Starting Eight Queens Frontend on port 5175...
 start "Eight Queens - Port 5175" cmd /k "cd /d "%ROOT_DIR%eight-queens\frontend" && npm run dev"
 timeout /t 3 /nobreak >nul
 
@@ -119,6 +124,7 @@ echo   - Snake and Ladder: http://localhost:3003
 echo   - Traveling Salesman: http://localhost:3002
 echo   - Tower of Hanoi: http://localhost:5174
 echo   - Eight Queens: http://localhost:5175
+echo   - Eight Queens API: http://localhost:3001
 echo.
 echo   If a game doesn't start, check its terminal
 echo   window for error messages.

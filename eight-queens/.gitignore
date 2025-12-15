@@ -6,10 +6,6 @@ dist/
 build/
 coverage/
 
-# Environment
-.env
-.env.*
-
 # Logs
 *.log
 logs/
